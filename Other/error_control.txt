@@ -1,0 +1,17 @@
+Error Control:
+Thực ra thì Error Control sẽ kết hợp với flow control thành một mảng tổng thể.
+Áp dụng kĩ thuật CRC check sum để kiểm tra gói có bị lỗi hay không.
+- Tự động sửa lỗi - Forwarding Error Control - FEC
+- Yêu cầu truyền lại - Backwarding Error Control - BEC
+	ARQ (Automatic Repeat Request): Sau khi gửi một số khung dữ liệu từ máy gửi
+đến máy nhận, máy gửi sẽ chờ một khoảng thời gian Time-out để nhận được phản hồi
+ACK hoặc NAK. Nếu ngoài thời gian Time-out hoặc NAK sẽ gửi lại khung dữ liệu đó
+	Các loại ARQ:
+		Stop-and-Wait: Sau khi gửi một khung hoặc gói tin người gửi không gửi
+	bất kì gói tìn nào đến khi có gói tin xác nhận.
+		Go-Back-N: Quá trình gửi tiếp tục gửi nhiều khung hoặc gói tin không cần 
+	chờ gói xác nhận từ người nhận. Khi gặp có mỗi lỗi thì gửi luôn một nhóm
+	liên tục các gói tin kể cả những gói tin không lỗi.
+		Selective Repeat: Giống như Go-Back-N tuy nhiên nếu như khung tin nào bị
+	lỗi hoặc timeout thì chỉ gửi lại gói tin đó thôi.
+	

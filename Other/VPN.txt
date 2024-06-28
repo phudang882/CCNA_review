@@ -1,0 +1,42 @@
+VPN:
+	*Site-to-site VPN
+	*Client-to-site VPN
+Site-to-site VPN:
+	Tạo ra đường hầm VPN đến router công ty
+	VD: ipsec, dmvpn...
+	
+Client-to-site VPN:
+	Config trên router của công ty một VPN muốn kết nối vào thì chỉ cần dùng phần mềm đăng nhập kết nối vào thôi.
+	VD: ssl, ...
+
+IPSEC VPN: https://www.youtube.com/watch?v=-z7Ujjea7zQ&list=PLQd3D0Eos95e_g0-j06fMz1Cj3c8dO9F-&index=3
+	Có 2 mode trong pha 1:
+		Main mode dùng 6 gói tin dùng 2 đầu ip tĩnh:
+			-2 Gói tin đầu (không mã hóa): dùng để thống nhất bộ proposal (1)
+			-2 Gói tin tiếp theo (không mã hóa): dùng để thống nhất key mã hóa (2)
+			-2 Gói tin cuối (mã hóa): Dùng để xác thực (3)
+		Aggresive mode dùng 3 gói tin chỉ cần 1 đầu ip tĩnh:
+			Tương đương với (1) (2) (3) tuy nhiên người khởi tạo áp đặt proposal
+	Trong pha 2 được chia như sau:
+		ESP hoặc AH:
+			AH: hash(ip header + data + key) -> IP header + Hash + Data
+			ESP: -> IP HDR + ESP HDR + Gói tin + ESP trailer + ESP Auth
+							|         |<------encrypted----->|
+							|<-----------Authicated--------->|
+		Transport hoặc Tunnel:
+			Transport: Ở mode này thì dùng để giao tiếp host-to-host nên vẫn giữ nguyên ip
+			Tunnel: Dùng để giao tiếp thông qua gate way(có thể là router, tường lửa):
+					** n host - gate way - to - gate way - n host
+					Do đó nó có thêm 1 IP header là Outer IP header
+				Ví dụ ESP Tunnel:
+					New IP HDR + ESP HDR + IP HDR + Data + ESP trailer + ESP Auth
+								|         |<------encrypted---------->|
+								|<------------Authicated------------->|
+						
+--------Config Site-to-site IPSEC VPN---------
+Các bước trên CiscoOS:
+	Bước 1: Cấu hình Access-list
+	Bước 2: Cấu hình IPSEC
+	Bước 3: crypto map IPSEC với Access-list và peer.
+	Bước 5: Cấu hình đính crypto map trên interface port.
+	

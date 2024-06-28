@@ -1,0 +1,420 @@
+Sau khi đến Edge sẽ được Nat ra ngoài với địa chỉ ip sau:
+100.1.x.2 với Edge1
+100.2.x.2 với Edge2
+Trong đó x là site của Edge
+Edge1S1 -> 100.1.1.2
+EDGE2S1 -> 100.2.1.2
+crypto isakmp policy 1
+ encr aes 192
+ hash md5
+ authentication pre-share
+ group 5
+crypto isakmp key cisco address 0.0.0.0        
+!
+!
+crypto ipsec transform-set VPN esp-aes 256 esp-sha384-hmac 
+ mode transport
+
+crypto ipsec profile VPN
+ set transform-set VPN
+int tunnel 1
+  tunnel protection ipsec profile VPN
+do write
+
+int tunnel 2
+  tunnel protection ipsec profile VPN
+do wr
+------------
+EDGE1S1:
+en
+conf t
+
+ 
+router ospf 1
+ network 10.0.0.0 0.255.255.255 area 0
+ network 192.168.0.0 0.0.255.255 area 0
+do wr
+
+
+host EDGE1S1
+int g0/1
+	ip add 100.1.1.2 255.255.255.252
+	no shut
+ip route 0.0.0.0 0.0.0.0 g0/1
+
+int g0/0
+	ip add 10.1.40.2 255.255.255.0
+	vrrp 1 ip 10.1.40.254 
+	vrrp 1 preempt
+	no shut
+	exit
+access-list 1 permit any
+ip nat inside source list 1 interface g0/1 overload
+int g0/0
+	ip nat inside
+int g0/1
+	ip nat outside
+
+no ip sla 1
+ip sla 1
+	icmp-echo 8.8.8.8
+		frequency 10
+		timeout 6000
+		exit
+ip sla schedule 1 life forever start now
+track 1 ip sla 1 reachability
+int g0/0
+	vrrp 1 track 1
+	
+interface Tunnel1
+ ip address 192.168.12.1 255.255.255.252
+ tunnel source GigabitEthernet0/1
+ tunnel destination 100.1.2.2
+ 
+
+do wr
+
+****
+EDGE2S1:
+en
+conf t
+
+ 
+host EDGE2S1
+router ospf 1
+ network 10.0.0.0 0.255.255.255 area 0
+ network 192.168.0.0 0.0.255.255 area 0
+int g0/1
+	ip add 100.2.1.2 255.255.255.252
+	no shut
+ip route 0.0.0.0 0.0.0.0 g0/1
+
+int g0/0
+	ip add 10.1.40.3 255.255.255.0
+	vrrp 1 ip 10.1.40.254
+	vrrp 1 priority 95
+	vrrp 1 preempt
+	no shut
+router ospf 1
+  network 10.0.0.0 0.255.255.255 area 0
+  exit
+access-list 1 permit any
+ip nat inside source list 1 interface g0/1 overload
+int g0/0
+	ip nat inside
+int g0/1
+	ip nat outside
+no ip sla 1
+ip sla 1
+	icmp-echo 8.8.8.8
+		frequency 10
+		timeout 6000
+		exit
+ip sla schedule 1 life forever start now
+track 1 ip sla 1 reachability
+int g0/0
+	vrrp 1 track 1
+interface Tunnel1
+ ip address 192.168.12.5 255.255.255.252
+ tunnel source GigabitEthernet0/1
+ tunnel destination 100.2.2.2	
+
+do write
+
+-------------
+EDGE1S2:
+en
+conf t
+ 
+host EDGE1S2
+router ospf 1
+ network 10.0.0.0 0.255.255.255 area 0
+ network 192.168.0.0 0.0.255.255 area 0
+int g0/1
+	ip add 100.1.2.2 255.255.255.252
+	no shut
+ip route 0.0.0.0 0.0.0.0 g0/1
+
+int g0/0
+	ip add 10.2.40.2 255.255.255.0
+	vrrp 1 ip 10.2.40.254
+	vrrp 1 priority 100
+	vrrp 1 preempt
+	no shut
+
+router ospf 1
+  network 10.0.0.0 0.255.255.255 area 0
+  exit
+access-list 1 permit any
+ip nat inside source list 1 interface g0/1 overload
+int g0/0
+	ip nat inside
+int g0/1
+	ip nat outside
+no ip sla 1
+ip sla 1
+	icmp-echo 8.8.8.8
+		frequency 10
+		timeout 6000
+		exit
+ip sla schedule 1 life forever start now
+track 1 ip sla 1 reachability
+
+int g0/0
+	vrrp 1 track 1
+interface Tunnel1
+ ip address 192.168.12.2 255.255.255.252
+ tunnel source GigabitEthernet0/1
+ tunnel destination 100.1.1.2
+interface Tunnel2
+ ip address 192.168.23.2 255.255.255.252
+ tunnel source GigabitEthernet0/1
+ tunnel destination 100.1.3.2
+
+do write
+
+****
+EDGE2S2:
+en 
+conf t
+
+host EDGE2S2
+router ospf 1
+ network 10.0.0.0 0.255.255.255 area 0
+ network 192.168.0.0 0.0.255.255 area 0
+int g0/1
+	ip add 100.2.2.2 255.255.255.252 
+	no shut
+ip route 0.0.0.0 0.0.0.0 g0/1
+
+int g0/0
+	ip add 10.2.40.3 255.255.255.0
+	vrrp 1 ip 10.2.40.254
+	vrrp 1 priority 95
+	vrrp 1 preempt
+	no shut
+router ospf 1
+  network 10.0.0.0 0.255.255.255 area 0
+  exit
+access-list 1 permit any
+ip nat inside source list 1 interface g0/1 overload
+int g0/0
+	ip nat inside
+int g0/1
+	ip nat outside
+no ip sla 1
+ip sla 1
+	icmp-echo 8.8.8.8
+		frequency 10
+		timeout 6000
+		exit
+ip sla schedule 1 life forever start now
+track 1 ip sla 1 reachability
+int g0/0
+	vrrp 1 track 1
+	
+interface Tunnel1
+ ip address 192.168.12.6 255.255.255.252
+ tunnel source GigabitEthernet0/1
+ tunnel destination 100.2.1.2
+interface Tunnel2
+ ip address 192.168.23.6 255.255.255.252
+ tunnel source GigabitEthernet0/1
+ tunnel destination 100.2.3.2
+ 
+do write
+-------------
+EDGE1S3:
+en
+conf t
+ 
+host EDGE1S3
+router ospf 1
+ network 10.0.0.0 0.255.255.255 area 0
+ network 192.168.0.0 0.0.255.255 area 0
+int g0/1
+	ip add 100.1.3.2 255.255.255.252 
+	no shut
+ip route 0.0.0.0 0.0.0.0 g0/1
+router ospf 1
+  network 10.0.0.0 0.255.255.255 area 0
+  exit
+int g0/0
+	ip add 10.3.40.2 255.255.255.0
+	vrrp 1 ip 10.3.40.254
+	vrrp 1 priority 100
+	vrrp 1 preempt
+	no shut
+router ospf 1
+  network 10.0.0.0 0.255.255.255 area 0
+  exit
+access-list 1 permit any
+ip nat inside source list 1 interface g0/1 overload
+int g0/0
+	ip nat inside
+int g0/1
+	ip nat outside
+no ip sla 1
+ip sla 1
+	icmp-echo 8.8.8.8
+		frequency 10
+		timeout 6000
+		exit
+ip sla schedule 1 life forever start now
+track 1 ip sla 1 reachability
+int g0/0
+	vrrp 1 track 1
+interface Tunnel1
+ ip address 192.168.34.1 255.255.255.252
+ tunnel source GigabitEthernet0/1
+ tunnel destination 100.1.4.2
+interface Tunnel2
+ ip address 192.168.23.1 255.255.255.252
+ tunnel source GigabitEthernet0/1
+ tunnel destination 100.1.2.2
+
+do write
+****
+EDGE2S3:
+en
+conf t
+
+ 
+host EDGE2S3
+router ospf 1
+ network 10.0.0.0 0.255.255.255 area 0
+ network 192.168.0.0 0.0.255.255 area 0
+int g0/1
+	ip add 100.2.3.2 255.255.255.252 
+	no shut
+ip route 0.0.0.0 0.0.0.0 g0/1
+int g0/0
+	ip add 10.3.40.3 255.255.255.0
+	vrrp 1 ip 10.3.40.254
+	vrrp 1 priority 95
+	vrrp 1 preempt
+	no shut
+router ospf 1
+  network 10.0.0.0 0.255.255.255 area 0
+  exit
+access-list 1 permit any
+ip nat inside source list 1 interface g0/1 overload
+int g0/0
+	ip nat inside
+int g0/1
+	ip nat outside
+no ip sla 1
+ip sla 1
+	icmp-echo 8.8.8.8
+		frequency 10
+		timeout 6000
+		exit
+ip sla schedule 1 life forever start now
+track 1 ip sla 1 reachability
+int g0/0
+	vrrp 1 track 1
+interface Tunnel1
+ ip address 192.168.34.5 255.255.255.252
+ tunnel source GigabitEthernet0/1
+ tunnel destination 100.2.4.2
+
+interface Tunnel2
+ ip address 192.168.23.5 255.255.255.252
+ tunnel source GigabitEthernet0/1
+ tunnel destination 100.2.2.2
+
+
+do write
+------------
+EDGE1S4:
+en
+conf t
+
+ 
+host EDGE1S4
+router ospf 1
+ network 10.0.0.0 0.255.255.255 area 0
+ network 192.168.0.0 0.0.255.255 area 0
+int g0/1
+	ip add 100.1.4.2 255.255.255.252 
+	no shut
+ip route 0.0.0.0 0.0.0.0 g0/1
+int g0/0
+	ip add 10.4.40.2 255.255.255.0
+	vrrp 1 ip 10.4.40.254
+	vrrp 1 priority 100
+	vrrp 1 preempt
+	no shut
+router ospf 1
+  network 10.0.0.0 0.255.255.255 area 0
+  exit
+access-list 1 permit any
+ip nat inside source list 1 interface g0/1 overload
+int g0/0
+	ip nat inside
+int g0/1
+	ip nat outside
+no ip sla 1
+ip sla 1
+	icmp-echo 8.8.8.8
+		frequency 10
+		timeout 6000
+		exit
+ip sla schedule 1 life forever start now
+track 1 ip sla 1 reachability
+int g0/0
+	vrrp 1 track 1
+do wr
+interface Tunnel1
+ ip address 192.168.34.2 255.255.255.252
+ tunnel source GigabitEthernet0/1
+ tunnel destination 100.1.3.2
+ 
+do write
+
+****
+EDGE2S4:
+en
+conf t
+
+ 
+host EDGE2S4
+router ospf 1
+ network 10.0.0.0 0.255.255.255 area 0
+ network 192.168.0.0 0.0.255.255 area 0
+int g0/1
+	ip add 100.2.4.2 255.255.255.252 
+	no shut
+ip route 0.0.0.0 0.0.0.0 g0/1
+
+int g0/0
+	ip add 10.4.40.3 255.255.255.0
+	vrrp 1 ip 10.4.40.254
+	vrrp 1 priority 95
+	vrrp 1 preempt
+	no shut
+router ospf 1
+  network 10.0.0.0 0.255.255.255 area 0
+  exit
+access-list 1 permit any
+ip nat inside source list 1 interface g0/1 overload
+int g0/0
+	ip nat inside
+int g0/1
+	ip nat outside
+no ip sla 1
+ip sla 1
+	icmp-echo 8.8.8.8
+		frequency 10
+		timeout 6000
+		exit
+ip sla schedule 1 life forever start now
+track 1 ip sla 1 reachability
+int g0/0
+	vrrp 1 track 1
+interface Tunnel1
+ ip address 192.168.34.6 255.255.255.252
+ tunnel source GigabitEthernet0/1
+ tunnel destination 100.2.3.2
+ 
+do write

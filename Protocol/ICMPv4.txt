@@ -1,0 +1,97 @@
+ICMP (Internet Control Message Protocol)
+https://datatracker.ietf.org/doc/html/rfc792
+Mở đầu: 
+	IP thiếu cơ chế kiểm soát lỗi và cơ chế hỗ trợ khác.
+	ICMP giải quyết vấn đề này:
+		Báo lỗi: báo gói tin không đến được với máy trạm, một mạng, một cổng, một 
+	giao thức.
+		Thông điệp phản hồi.
+ICMP:
+	- Giao thức tầng mạng
+	- Thông điệp chứa trong gói IP (hay encap ra được gói IP)
+		IP header:
+			Ver: 4
+			DS: 0
+			UProtocol: 1
+			
+	- ICMP message: Type, code, cùng với 8 bytes đầu tiên của gói tin IP bị lỗi
+Cơ chế:
+	IP(ICMP query)  A ---Router X---> B:
+		Error: IP(ICMP error) Router X -> A
+		Reply: IP(ICMP query) B -> A
+ICMP có dạng:
+	<--------------------------------------->
+	|  Type  |  Code  | 	 Checksum		|
+	|			   Optional					|
+	|				Data					|
+	^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+	Type (8 bits): dạng gói tin ICMP
+		Error:
+			3: Destination Unreachable - Không đến được đích
+			4: Source Quench - Lưu lượng quá tải cần giảm lưu lượng
+			5: Redirect - Yêu cầu đổi hướng khi có nhận có thể đi trực tiếp
+			11: Time exceeded 
+			12: Parameter problem
+		Query:
+			8 (Request) và 0 (Reply) : Echo
+			13 (Request) và 14 (Reply) : Timestamp 
+			17 (Request) và 18 (Reply) : Address mask 
+			9 và 10: Router advertisement and Solicitation
+	Code (8 bits): nguyên nhân 
+		Đối với mỗi type sẽ mã code ý nghĩa khác nhau.
+		Error code trong type thường thấy:
+			Type = 3, Destination Unreachable
+				code = 0 -> Network Unreachable
+				code = 1 -> Host Unreachable
+				code = 2 -> Protocol Unreachable
+				code = 3 -> Port Unreachable
+			Type = 11, Time Exceeded
+				code = 0 -> TTL expired
+				code = 1 -> Fragment reassembly time exceeded
+			Type = 12, Parameter problem
+				code = 0 -> Lỗi chỉ ra trong trường Pointer
+				code = 1 -> Thiếu Option bắt buộc
+				code = 2 -> Độ dài không đúng
+		https://www.ibm.com/docs/en/qsip/7.4?topic=applications-icmp-type-code-ids
+	Checksum (16 bits)
+		Nếu như checksum bị lỗi:
+			Có 1 trường pointer để chỉ vị trí lỗi
+			Type của ICMP là 12 (Parameter problem) và code = 0
+	Optional (32 bits)
+		Tùy vào loại ICMP mà sẽ sử dụng Optional khác nhau.
+		Destination Unreachable Message: Không sử dụng
+		
+ICMP và các ứng dụng:
+
+Ping: kiểm tra kết nối, đôi chút về chất lượng kết nối.
+Traceroute: kiểm tra, dò đường đi của kết nối.
+	
+Ping và ICMP:
+	Mỗi ICMP có 1 ID
+	Dùng để tính thời gian RTT - Round Trip Time
+Traceroute và ICMP:
+	Traceroute A -> B, cơ chế:
+		A -> B: IP(TTL = 1, Data = ICMP) 
+		R1-> A: IP(Data = ICMP(Type = 11, Code = 0))
+		A -> B: IP(TTL = 2, Data = ICMP)
+		R2-> A: IP(Data = ICMP(Type = 11, Code = 0, Data = (R2,Address of R2,...))
+				...............
+		IP(TTL = x, Data = ICMP) A -> B
+			*B -> A: IP(Data = ICMP
+			*Rx-> A: IP(Data = ICMP(Type = 3, Code = 3)
+		Với R1,..Rx là tên của Router
+		
+	Viết lại theo cơ chế mới
+		IP (A -> B, TTL: 1) [ICMP]
+			* IP (R1-> A) [ICMP (Type: 11, Code: 0) [R2,Address of R2,...]]
+		IP (A -> B, TTL: 2) [ICMP]
+			* IP (R2-> A) [ICMP (Type: 11, Code: 0) [R2,Address of R2,...]]
+				...............
+		IP (A -> B, TTL: x) [ICMP]
+			* IP (Rx -> A) [ICMP (Type: 0, Code: 8) [R2,Address of R2,...]]
+			* IP (B -> A) [ICMP (Type: 11, Code: 0) [R2,Address of R2,...]]
+	Ý nghĩa:
+		Thực hiện gửi ICMP với IP TTL tăng đần từ 1 2,...
+			Với mỗi TTL kết thúc khi gửi đủ 3 gói
+		Router reply ICMP gồm tên và địa chỉ của Router
+		Traceroute kết thúc khi đến đích hoặc nhận được Unreachable message.

@@ -1,0 +1,88 @@
+DHCP (Dynamic Host Configuration Protocol): Tầng Network
+Dùng để thực hiện xin địa chỉ IP
+Tổng quan:
+	DHCP DISCOVER: Ban đầu, một máy tính DHCP Client muốn gia nhập mạng, 
+nó yêu cầu thông tin địa chỉ IP từ DHCP Server bằng cách gửi broadcast một gói DHCP 
+Discover. Địa chỉ IP nguồn trong gói là 0.0.0.0 bởi vì client chưa có địa chỉ IP.
+
+	DHCP OFFER: Mỗi DHCP server nhận được gói DHCP Discover từ client đáp ứng với 
+gói DHCP Offer chứa địa chỉ IP cho thuê và thông tin định cấu hình TCP/IP bổ sung
+(thêm vào), chẳng ạn như subnet mask và gateway mặc định. Nhiều hơn một DHCP server 
+có thể đáp ứng với gói DHCP Offer. Client sẽ chấp nhận gói DHCP Offer đầu tiên nó 
+nhận được.
+
+	DHCP REQUEST: Khi DHCP client nhận được một gói DHCP Offer, nó đáp ứng lại bằng 
+việc broadcast gói DHCP Request mà chứa yêu cầu địa chỉ IP mà server cung cấp trong 
+bản tin offer - thể hiện sự chấp nhận của địa chỉ IP được yêu cầu từ một server xác 
+định.
+
+	DHCP ACK: DHCP server được chọn lựa chấp nhận DHCP Request từ Client cho địa 
+chỉ IP bởi việc gửi một gói DHCP Acknowledge (ACK). Tại thời điểm này, Server cũng 
+định hướng bất cứ các tham số định cấu hình tuỳ chọn. Sự chấp nhận trên của DHCP 
+Acknowledge, Client có thể tham gia trên mạng TCP/IP và hoàn thành hệ thống khởi 
+động. (Bản tin này gần như giống nội dung bản tin OFFER)
+
+	DHCP NAK: Nếu địa chỉ IP không thể được sữ dụng bởi client bởi vì nó không còn 
+giá trị nữa hoặc được sử dụng hiện tại bởi một máy tính khác, DHCP Server đáp ứng 
+với gói DHCP Nak, và Client phải bắt đầu tiến trình thuê bao lại. Bất cứ khi nào 
+DHCP Server nhận được yêu cầu từ một địa chỉ IP mà không có giá trị theo các Scope 
+mà nó được định cấu hình với, nó gửi thông điệp DHCP Nak đối với Client.
+
+	DHCP DECLINE: Khi client nhận được thông tin cấu hình từ DHCP server, nhưng có 
+thể xảy ra vấn đề là IP mà DHCP server cấp đã bị sử dụng bởi một thiết bị khác thì 
+nó gửi gói DHCP Decline đến các Server và Client phải bắt đầu tiến trình thuê bao 
+lại từ đầu.
+
+	DHCP RELEASE: Một DHCP Client khi không còn nhu cầu sử dụng IP hiện tại nữa nó 
+sẽ gửi một gói DHCP Release đến server quản lý để giải phóng địa chỉ IP và xoá bất 
+cứ hợp đồng thuê bao nào đang tồn tại.
+
+	DHCP INFORM: Các thiết bị không sử dụng DHCP để lấy địa chỉ IP vẫn có thể sử 
+dụng khả năng cấu hình khác của nó. Một client có thể gửi một bản tin DHCP INFORM 
+để yêu cầu bất kì máy chủ có sẵn nào gửi cho nó các thông số để mạng hoạt động. 
+DHCP server đáp ứng với các thông số yêu cầu – được điền trong phần tùy chọn của 
+DHCP trong bản tin DHCP ACK.
+
+Các bước:
+	Client           			DHCP Servers
+			
+				XID1
+
+(1)	DISCOVER  ----Broadcast--> 
+(2)			  <----Unicast----	OFFER(YIAddr)
+		 
+* 	Seclect 
+first OFFER
+				XID2
+(3)	REQUEST	  ----Broadcast-->		
+(Server ID,IP,List
+	Option)
+	
+(4)			  <----Unicast----	ACK or NAK or Not send
+			  <---Broadcast---	If FLag == 1 
+*	If NAK or not recieve
+Return (1)
+*	If ACK
+Save (IP,List Option)
+	|
+	Reboot
+	|
+Return (3)
+	|
+	|
+	Lease time out
+	|
+Renew
+(5) REQUEST	  ----Unicast---->
+								Server up and send
+			  <----Unicast----	ACK
+If not success ACK
+Rebind
+Return (3)
+-----------------
+Cấu trúc:
+https://camo.githubusercontent.com/f96003ff6f73ac04a49bf917d80a2b78777837c486bf2b753293295763129eeb/687474703a2f2f692e696d6775722e636f6d2f384861753759722e706e67
+								
+								
+								
+	

@@ -1,0 +1,69 @@
+IPv6 Unicast address:
+	|			Prefix Unicast		|		Interface ID		|
+	* Vấn đề Interface ID phức tạp:
+			Interface_ID.txt
+	
+- Global Unicast:
+		|			Prefix Unicast			  |			Interface ID		|
+		 <--------n bits---------> <----m---->
+		|  global routing prefix  | subnet ID |			Interface ID		|
+	Global routing prefix hiện nay đang được đăng kí:
+		2000::/3
+- Unspecified:
+	::/128
+- Loopback:
+	::1/128
+- IPv4-Compatible IPv6 address:
+	Mạng ::/96
+	-> ::v4.v4.v4.v4
+	* Không được dùng nữa.
+- IPv4-Mapped IPv6 Addresses:
+	Mạng ::ffff:0:0/96
+	-> ::ffff:v4.v4.v4.v4
+		Với v4.v4.v4.v4 là địa chỉ IPv4.
+	Chỉ để ứng dụng chuyển đổi trong các tầng ứng dụng.
+
+- IPv4-Embedded IPv6 address:
+	+ WKP (Well-Know Prefix):
+		64:ff9b::/96
+		Giống IPv4-Mapped IPv6 address.
+	+ NSP (Network-Specific Prefix):
+		Với độ dài prefix bằng 96 giống IPv4-Mapped còn độ dài bé hơn 64:
+			|  n bits Network Prefix | m IPv4 | Null byte | k IPv4 |Suffix |
+			IPv4 tách ra thành m IPv4 1 và k IPv4 
+			n + m = 64
+			* Suffix "nên" được dùng Null.
+			* Lưu ý không có định nghĩa trong "khoảng" 64-96.
+	* Quy tắc:
+		Đối với WKP, bắt buộc phải là Global IPv4 address
+		Đối với NSP:
+			Độ dài subnet prefix > prefix WKP, không được quảng bá BGP.
+	Sử dụng để chuyển đổi từ IPv4 sang IPv6 (Kể cả inter-routing)
+	Thuộc dạng Global Unicast Address (tuy nhiên cần cẩn thận).
+
+- Local-Use IPv4/IPv6 translation (Chỉ dùng Private):
+	64:ff9b:1::/48
+
+- Link-local:
+	fe80::/10
+	Trên 1 đường link duy nhất
+
+- ULA (Unique Local Addresses): sử dụng trong nội bộ tuy nhiên nó khác với IPv4
+	Được định nghĩa trong: RFC 4193 (Proposed Standard)
+	Dãy địa chỉ này được dùng trong giao tiếp nội bộ (local) tuy nhiên lại mang tính duy
+nhất trên thế giới (globally unique).
+	  | 7 bits |1|  40 bits   |  16 bits  |          64 bits           |
+	  +--------+-+------------+-----------+----------------------------+
+	  | Prefix |L| Global ID  | Subnet ID |        Interface ID        |
+	  +--------+-+------------+-----------+----------------------------+
+	Prefix: fc00::/7 prefix
+	L: Hiện tại giá trị bằng 1 tương ứng địa chỉ nội bộ.
+		* Còn giá trị bằng 0 chưa dùng.
+	Global ID: Giá trị được random để tạo ra 40 bits "duy nhất" trên thế giới.
+	Subnet ID: Subnet trong một phạm vi mạng.
+	Bởi chỉ có L=1 nên dãy địa chỉ được dùng hiện nay:
+	* fd00::/8
+		Và thiết kế cho khối /48 trong đó người dùng có thể tạo nhiều subnet
+		
+		
+*** MAC_Address.txt

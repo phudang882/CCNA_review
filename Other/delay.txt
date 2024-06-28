@@ -1,0 +1,7 @@
+Delay sẽ có nhiều loại:
+- Processing delay: thực ra là độ trễ cho quá trình xử lý dữ liệu đầu vào.
+- Queue delay: Sau khi xử lí đầu vào thì dữ liệu sẽ đi đến 1 queue để chuẩn 
+bị cho quá trình tiếp theo
+- Transmission delay: Quá trình biến đổi dữ liệu trong queue ra ngoài môi trường 
+truyền dẫn
+- Propagation delay: Quá trình lan truyền trong môi trường

@@ -1,0 +1,28 @@
+Mô hình OSI (Open System Interconnection, mô hình kết nối mở) là mô hình quy chuẩn
+cho một hệ thống khi thực hiện các giao tiếp trong mạng máy tính.			
+Nó gồm các tầng:
+	| Tầng Application: Ứng dụng sử dụng mạng xử lý logic
+	| Tầng Presentation: Mã hóa giải mã,.... Trước kia có SSL,
+						Dạng dữ liệu trao đổi
+	| Tầng Session: Quản lí các phiên giao tiếp của nhiều ứng dụng
+	| Tầng Transport: Xử lí lỗi, Kiểm soát dòng và 
+	| Tầng Network: Xử lí địa chỉ cấp cao, thực hiện giải thuật tìm địa chỉ
+	| Tầng DataLink: Xử lí địa chỉ cấp thấp (Mac), thuật toán giao tiếp vật lý
+	| Tầng Physics ---->Modulation: Xử lý lỗi thực hiện chuyển tải tín hiệu
+	| Dây dẫn (Thực ra cũng nằm trong tầng Physics)
+	| Tầng Physics ---->Demudulation (Máy nhận)
+	| Tầng DataLink
+	| Tầng Network
+	| Tầng Transport
+	| Tầng Session
+	| Tầng Presentation
+	| Tầng Application
+SAP (Service Access Point): Điểm truy cập dịch vụ thực hiện để phân các tầng 
+và sử dụng các dịch vụ của tầng trên và tầng dưới.
+- Tại sao phải phân tầng?
+	+ Chia để trị
+	+ Các tầng hoạt động độc lập
+		*Có thể tập trung vào một tầng không cần phải quan tâm đến tầng dưới
+		*Cho phép định nghĩa các thành phần giao diện của các tầng.
+	+ Dễ mở rộng phát triển
+	+ Mềm dẻo, linh hoạt với các công nghệ mới

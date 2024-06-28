@@ -1,0 +1,79 @@
+Định tuyến là gì ?
+Định tuyến (Routing) là quá trình xác định đường đi từ một điểm đến một điểm khác
+trên mạng. Định tuyến có thể xảy ra ở nhiều lớp khác nhau của mô hình OSI, nhưng
+thường xảy ra ở lớp 3 (Network Layer).
+
+Định tuyến gồm định tuyến tĩnh và định tuyến động.
+
+Định tuyến tĩnh: 
+	Như cái tên định tuyến được quản trị viên cấu hình thủ công.
+	Có một khái niệm đặc biệt đó chính là Default route có dạng:
+		Destination	subnet		Via
+		0.0.0.0  0.0.0.0 		ipv4_address or port interface
+	Default route ở nằm cuối bảng định tuyến được sử dụng cuối cùng khi không thấy
+định tuyến khớp -> nó giống một cánh cổng giữa nội bộ và bên ngoài.
+
+Định tuyến động:
+	Định tuyến tự học thông tin từ mạng rồi dùng thông tin và các giải thuật tìm
+đường đi tốt nhất để định tuyến. Các quản trị viên không cần phải cấu hình thủ
+công.
+	Một số khái niệm để xây dựng đường đi:
+		Metric:
+			Là tham số sử dụng để chọn đường đi tốt nhất trong việc định tuyến.
+			Metric có thể nói là ướng lượng chi phí đường đi, càng thấp thì đường
+		đi đó càng được chọn.
+		AD:
+			AD (administrative Distance), chỉ độ tin cậy của giao thức định tuyến
+		một node cùng được học từ nhiều giao thức thì tuyến của giao thức có AD bé
+		nhất sẽ nằm trên bảng định tuyến.
+
+	* Dựa vào nơi lưu trữ thông tin đường đi và cách thức trao đổi ta chia định tuyến
+động làm 2 loại:
+		Link-state
+		Distance-vector
+		
+	- Distance-vector:
+		Thông tin chọn đường phân tán: trao đổi thông tin của nút kế bên, chỉ biết
+	đến 1 phần của tuyến đường đi.
+		Trao đổi thông tin liên tục.
+		-> tốn băng thông.
+		-> một nút thay đổi theo dây chuyền tốc độ cập nhật hội tụ chậm.
+		
+	- Link-state:
+		Thông tin chọn đường tập trung: trao đổi thông tin dạng multicast, biết cả
+	toàn bộ tuyến đường.
+		-> Xử lý toàn bộ tuyên đường đi -> tốn CPU,...
+		Đa số dùng giải thuật Distance-vector.
+	* Theo cơ chế quảng bá mask của địa chỉ ta chia ra làm 2 loại:
+		Classfull routing protocol
+		Classless routing protocol
+	- Classfull:
+		Nếu như không kết nối trực tiếp, mask của địa chỉ: network-mask.
+		Nếu như kết nối trực tiếp, mask giống với cấu hình với router.
+	- Classless:
+		Quảng bá kèm với subnet-mask cùng với địa chỉ đích.
+	
+	* Theo tầm vực quảng bá ta chia ra làm 2 loại:
+		Interior Gateway Protocol (IGP)
+		Exterior Gateway Protocol (EGP)
+	- IGP:
+		Quảng bá trong một mạng nội bộ (Hầu như tất cả các giải thuật mà ta nói
+	ở trên Distance-vector hay Link-state đều là IGP).
+	- EGP:
+		Quảng bá giữa các mạng ngoại vi.
+	* AS (Autonomous System):
+		AS là một tập hợp các mạng và các router mà chúng được quản lý bởi một tổ
+	chức duy nhất.
+		Mỗi AS có một số định danh duy nhất được gọi là AS number.
+		AS được chia ra làm 2 loại:
+			- Stub AS: không có kết nối với AS khác.
+			- Transit AS: có kết nối với nhiều AS khác.
+		IGP là những giao thức định tuyến được sử dụng trong một AS.
+		EGP là những giao thức định tuyến được sử dụng giữa các AS.
+	* EGP hiện tại ta có một giao thức duy nhất đó chính là BGP (Border Gateway
+	Protocol).
+		* BGP.txt
+	Giải thuật tìm đường đi ngắn nhất:
+		Hai giải thuật được sử dụng thịnh hành đó chính là: Dijkstra (SPF) và 
+	Bellman-Ford.
+		* SPT.ipynb

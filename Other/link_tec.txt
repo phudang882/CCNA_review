@@ -1,0 +1,22 @@
+Giải thuật token ring:
+    Khởi tạo: tạo ra một token sau đó chuyển đến máy bắt đầu trong vòng
+	Nhận dữ liệu: Sau khi nhận được token nếu như trong token có địa chỉ đích là máy hiện tại thì lấy dữ liệu, và khẳng định ở byte cuối khung.
+	Truyền dữ liệu: Sau khi nhận token nếu như có dữ liệu cần truyền thì ghi vào token gồm địa chỉ và dữ liệu, thay đổi trạng thái token thành đã bị chiếm.
+					Nếu không có dữ liệu thì đơn giản chuyển token đi máy khác.
+	Xác nhận: Khi người nhận lại được token thì sẽ kiểm tra byte xác nhận nếu có thì xóa dữ liệu thay đổi trạng thái token.
+
+Giải thuật CSMA/CD:
+
+
+
+Giải thuật CSMA/CA:
+
+
+
+Giải thuật Aloha:
+
+
+
+
+
+	

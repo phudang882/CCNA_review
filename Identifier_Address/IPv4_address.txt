@@ -1,0 +1,37 @@
+IPv4 Address là địa chỉ dùng 32 bit có dạng A.B.C.D và được sử dụng trong IPv4.
+- Ban đầu địa chỉ IPv4 có dạng: 
+		<network>	|  <host>
+- Có các dạng kết nối địa chỉ:
+	Unicast  : địa chỉ của một host.
+	Broadcast: địa chỉ được sử dụng để gửi gói tin đến tất cả các thiết bị trong mạng, 
+được mặc định là địa chỉ mà tất cả bit host là 1.
+	Multicast: địa chỉ được sử dụng để gửi gói tin đến một nhóm các thiết bị trong mạng 
+được chia trong class D và các bit địa chỉ bắt đầu từ 1110.
+
+- Chia ra làm các classfull network (major network):
+	* Lớp A: bắt đầu 1 bit 0 dùng 8 bit đầu làm mạng
+		1-126.0.0.0
+	* Lớp B: bắt đầu 2 bit 10 dùng 16 bit đầu làm mạng
+		128-191.0.0
+	* Lớp C: bắt đầu 3 bit 110 dùng 24 bit đầu làm mạng
+		192-223.0.0.0
+	* Lớp D: bắt đầu 4 bit 1110 dành cho multicast hoặc broadcast
+		224-239.0.0.0
+	* Lớp E: băt đầu 4 bit 1111 dành cho dự phòng và nghiên cứu
+		240-254.0.0.0
+- Sau đó VLSM cũng như CIDR ra đời làm thay đổi IPv4:
+	<network>|<subnet>|<host>
+	<-------CIDR------>
+	Các network mask sang dạng số bit chiếm bởi network + subnet
+	Lớp A: 255.0.0.0 		-> /8
+	Lớp B: 255.255.0.0		-> /16
+	Lớp C: 255.255.255.0	-> /24
+		
+Dãy địa chỉ ipv4 private:
+	* 10.0.0.0/8
+	* 127.0.0.0/8: địa chỉ loopback dành cho pc
+	* 172.16.0.0/12
+		172.16.0.0 - 172.31.0.0/16
+	* 192.168.0.0/16
+Dãy địa chỉ Link-local ipv4 auto private (DHCP failed):
+	* 169.254.0.0/16

@@ -1,0 +1,23 @@
+Cấu trúc của stack TCP/IP là một bộ các giao thức mạng được sử dụng để truyền thông giữa các thiết bị trong mạng. 
+Nó được chia thành nhiều lớp khác nhau, mỗi lớp đảm nhận một nhiệm vụ cụ thể trong quá trình truyền thông.
+
+Dưới đây là cấu trúc của stack TCP/IP:
+
+Lớp ứng dụng (Application Layer): Lớp này cung cấp các giao thức và dịch vụ để ứng dụng có thể truyền thông với nhau. 
+Ví dụ về các giao thức trong lớp này là HTTP, FTP, SMTP.
+
+Lớp Transport (Transport Layer): Lớp này đảm nhận việc chia nhỏ dữ liệu thành các gói tin và đảm bảo việc truyền 
+thông tin tin cậy giữa các thiết bị. Giao thức phổ biến trong lớp này là TCP (Transmission Control Protocol) và 
+UDP (User Datagram Protocol).
+
+Lớp Internet (Internet Layer): Lớp này quản lý việc định tuyến và định danh các thiết bị trong mạng. Giao thức 
+chính trong lớp này là IP (Internet Protocol).
+
+Lớp Liên kết dữ liệu (Link Layer): Lớp này đảm nhận việc truyền dữ liệu qua các phương tiện truyền thông vật lý 
+như Ethernet, Wi-Fi. Nó cũng quản lý việc truyền dữ liệu giữa các thiết bị trong một mạng cục bộ.
+
+Lớp Vật lý (Physical Layer): Lớp này đảm nhận việc truyền dữ liệu qua các phương tiện truyền thông vật lý như cáp 
+mạng, sóng radio.
+
+Cấu trúc của stack TCP/IP cho phép các thiết bị trong mạng có thể truyền thông với nhau một cách hiệu quả và đáng 
+tin cậy. Mỗi lớp đảm nhận một phần công việc cụ thể, tạo nên một hệ thống mạng toàn diện.

@@ -1,0 +1,5 @@
+en
+conf t
+	int fa0/0
+	no sw            (chuyển sang port ip address)
+	ip address 192.168.1.1 255.255.255.0

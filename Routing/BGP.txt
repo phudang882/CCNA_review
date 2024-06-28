@@ -1,0 +1,30 @@
+BGP (Border Gateway Protocol)
+    - Khái niệm:
+        Là giao thức định tuyến được sử dụng để quảng bá thông tin định 
+    tuyến giữa các AS (Autonomous System).
+        Sử dụng giải thuật Path-vector để quảng bá thông tin định tuyến.
+        AS-path: đường đi của gói tin qua các AS.
+    - Chia ra làm 2 loại:
+        - eBGP: BGP giữa các AS khác nhau.
+        - iBGP: BGP giữa các router trong cùng một AS.
+    - Các thuộc tính của BGP:
+        + ORGIN: Nguồn của thông tin định tuyến.
+        + AS_PATH: Đường đi của gói tin qua các AS.
+        + NEXT_HOP: Địa chỉ IP của router tiếp theo.
+        + MED: Multi-Exit Discriminator.
+        + LOCAL_PREF: Ưu tiên của AS.
+        + ATOMIC_AGGREGATE: Tóm gọn thông tin định tuyến.
+        + AGGREGATOR: Router tóm gọn thông tin định tuyến.
+        + COMMUNITY: Nhóm của các AS.
+    - Các bước chọn đường đi:
+        B1: NEXT_HOP? Kiểm tra xem địa chỉ NEXT_HOP có khả dụng không.
+        B2: So sánh LOCAL_PREF: Ưu tiên LOCAL_PREF
+		B3: So sánh độ dài AS_PATH.
+		B4: So sánh ORGIN.
+		B5: So sánh MED.
+		B6: So sánh EGBP/IBGP.
+		B7: So sánh chi phí tới NEXT_HOP.
+		B8: So sánh Router ID.
+
+Path-vector routing:
+	

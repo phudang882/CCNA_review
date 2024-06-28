@@ -1,0 +1,84 @@
+Nhắc lại:
+Địa chỉ IPv6 Global Unicast:
+	Dành cho duy nhất một inteface.
+	Dùng truy cập internet.
+	Có địa chỉ bắt 000.
+	
+IPv6 Global Unicast có dạng như sau:
+	|			Prefix Unicast			  |			Interface ID		|
+	 <--------n bits---------> <----m---->
+	|  global routing prefix  | subnet ID |			Interface ID		|
+	
+	Đối với IID (Interface ID) ta có những trường hợp sau (RFC7721):
+	+--------------+-------------+----------+-------------+-------------+
+	| Mechanism(s) | Correlation | Location | Address     | Device      |
+	|              |             | tracking | scanning    | exploits    |
+	+--------------+-------------+----------+-------------+-------------+
+	| IEEE         | For device  | For      | Possible    | Possible    |
+	| identifier   | lifetime    | device   |             |             |
+	|  (Modified   |			 | lifetime |			  |				|
+	|	EUI-64)    |             |  		|             |             |
+	|              |             |          |             |             |
+	| Static       | For address | For      | Depends on  | Depends on  |
+	| manual       | lifetime    | address  | generation  | generation  |
+	|              |             | lifetime | mechanism   | mechanism   |
+	|              |             |          |             |             |
+	| Constant,    | For address | For      | No          | No          |
+	| semantically | lifetime    | address  |             |             |
+	| opaque       |             | lifetime |             |             |
+	|              |             |          |             |             |
+	| CGA          | For         | No       | No          | No          |
+	|              | lifetime of |          |             |             |
+	|              | (modifier   |          |             |             |
+	|              | block +     |          |             |             |
+	|              | public key) |          |             |             |
+	|              |             |          |             |             |
+	| Stable,      | Within      | No       | No          | No          |
+	| semantically | single IPv6 |          |             |             |
+	| opaque       | link        |          |             |             |
+	|              |             |          |             |             |
+	| Temporary    | For temp    | No       | No          | No          |
+	|              | address     |          |             |             |
+	|              | lifetime    |          |             |             |
+	|              |             |          |             |             |
+	| DHCPv6       | For lease   | No       | Depends on  | No          |
+	|  (DUID)      | lifetime    |          | generation  |             |
+	|              |             |          | mechanism   |             |
+	+--------------+-------------+----------+-------------+-------------+
+	IEEE identifier:
+		https://datatracker.ietf.org/doc/html/rfc4291#section-2.5.4
+		Định nghĩa các địa chỉ bắt đầu khác 000 dùng Modified EUI-64(***).
+		-> Các vấn đề bảo mật.
+		Được cập nhật lại trong:
+			RFC 7136(PD): Significance of IPv6 Interface Identifiers
+			https://datatracker.ietf.org/doc/html/rfc7136
+			Thay đổi: 
+				Chỉ IID được suy diễn từ IEEE ID thì phải là Modified EUI-64.
+				Hủy bỏ công dụng của universal/local bit.
+				IID "phải" là một chuỗi mơ hồ không có ý nghĩa.
+		Được khuyến khích sử dụng trong:
+			RFC 8064(PD): Recommendation on Stable IPv6 Interface Identifiers
+			https://datatracker.ietf.org/doc/html/rfc8064
+			Khuyên dùng SLAAC
+			Tránh nhúng địa chỉ lớp liên kết (data-link layer)
+
+	Static manual:
+		Tùy người dùng
+	
+	Constant:
+		RFC 4941: Privacy Extensions for Stateless Address Autoconfiguration in IPv6
+		Hệ điều hành Windows dùng.
+	CGA:
+		RFC 33971
+		https://datatracker.ietf.org/doc/html/rfc3972
+	Stable, Semantically Opaque IIDs:
+		https://datatracker.ietf.org/doc/html/rfc7217
+		SLAAC.
+	Temporary:
+		https://datatracker.ietf.org/doc/html/rfc8981
+	DHCPv6 (DUID):
+		https://datatracker.ietf.org/doc/html/rfc8415
+
+
+
+(***) MAC_Address.txt

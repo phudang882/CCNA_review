@@ -1,0 +1,10 @@
+Chuyển mạch:
+- Circuit: Dạng chuyển mạch trên tần số hoặc thời gian nó sẽ chia ra từng user 1 lượng 
+băng thông duy nhất. Và tất nhiên nó sẽ không có trình tạng đụng độ.
+- Packet: dạng này thường sẽ chia sẻ toàn bộ băng thông, theo lý thuyết giả sử
+rằng sẽ có lượng người đang dùng rất ít khả năng đụng độ thấp.
+	Vậy nên ở Packet sẽ có phương pháp để tránh đụng độ (collision avoid) hoặc 
+nhận biết đụng độ (collision detection).
+	Ngoài ra có nhiều cơ chế khi đụng độ ví dụ như: lưu lại tạo ra một queue để
+truyền ra ngoài.
+Vì nhiều ưu điểm trên người ta đã chuyển sang dạng packet switching

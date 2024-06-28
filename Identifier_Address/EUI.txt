@@ -1,0 +1,78 @@
+Các ngành công nghệ phát triển mạnh dẫn đến số lượng các công ty cũng tăng.
+Việc gán Mã cho từng sản phẩm của các công ty cũng được quan tâm nhiều hơn.
+	* Tính độc nhất.
+	* Dễ nhận diện và tra mã (Chuẩn theo form)
+	* Dễ mở rộng.
+	* Linh hoạt với các công nghệ.
+	* Thuận tiện cho việc giao tiếp.
+IEEE cho ra một chuẩn giao tiếp: 
+
+Bit đặc biệt: có 2 Bit X (U/L) và bit M (I/G)
+	Nằm ở Octet đầu tiên.
+	Dùng để phân biệt các loại ID.
+	|<--------First 8 bits--------->|
+	| 7 | 6 | 5 | 4 | 3 | 2 | 1 | 0 |
+							| X | M |
+	
+Bit X (U/L): là bit "tầm vực sử dụng" với 2 giá trị Universal/Local.
+	Với bit X = 0 tương ứng Universal: trên toàn thế giới.
+	Với bit X = 1 tương ứng Local: trên nội bộ.
+	
+Bit M (I/G): là bit "lượng" của "phần mở rộng" với 2 giá trị Individiual/Group (Cá nhân/Nhóm)
+	Về cơ bản với M = 0 (Individiual) nó là dành cho 1 thiết bị.
+	Còn nếu M = 1 (Group) nó đại diện cho nhóm thiết bị (tùy các định nghĩa của tổ chức và 
+giao thức sử dụng)
+	
+OUI (Organizationally Unique Identifier): tạm dịch Mã định danh tổ chức đơn nhất.
+	Duy nhất toàn cầu.
+	Độ dài: 24 bits
+	* Bit X (U/L) = 0, Bit M (I/G) = 0
+	* Một số Block ID được đăng kí các chuẩn trước có X = 1 nhưng cũng được quản lý trong
+	OUI registry (MA-L)
+	
+OUI-36: OUI base + 12 bits
+	OUI base: Giống form của OUI nhưng không được sử dụng như OUI
+
+CID (Company ID): Tạm dịch Mã định danh công ty tổ chức
+	Duy nhất toàn cầu.
+	* Bit X (U/L) = 1, Bit M (I/G) = 0
+	* Chỉ có thể mở rộng ở tầm vực nội bộ, IEEE khuyến khích nên mở rộng theo SLAP(Structured 
+	Local Address Plan)
+	
+Tùy vào nhu cầu của công ty: có thể đăng kí OUI hoặc CID. 
+Extendended Identifier: dạng mở rộng của OUI hoặc CID.
+
+EUI (Extended Unique Identifier): tạm dịch Mã định danh mở rộng đơn nhất.
+	Duy nhất toàn cầu.
+	Dành cho trên từng thiết bị phần cứng hoặc các phần tử khác (phần mềmchẳng hạn).
+	Sử dụng trong giao tiếp (có thể là biến đổi sang 1 thành phần khác ví dụ như MAC)
+
+Cách thức đăng kí:
+	Cơ quan lưu trữ và đăng kí: IEEE RA (Registration Authority)
+	Có 4 loại lưu trữ :
+		MA-L (OUI), MA-M, MA-S (OUI-36), CID
+	Chọn một loại hiện tại đủ điều kiện đăng kí.
+	Đăng kí và thanh toán.
+	IEEE RA sẽ phân cho bạn một OUI hoặc CID.
+		Nếu là MA thì bạn tiếp tục đăng kí EUI cho các sản phẩm của mình (Assign extension)
+	MA-M, MA-S có thêm option đăng kí CID để định danh 24-bit công ty.
+	
+EUI-48:
+	Cấu trúc:
+	  Kiểu	|<------------------48 bits--------------->|
+	- MA-L:	|		24 OUI 	      |  		24		   |
+	- MA-M:	|			28 MA-M base  | 	 20	   	   |
+	- MA-S:	|			36 MA-S OUI-36		|	 12	   |
+			^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+		(Đơn vị bit)
+	* Bit X (U/L) = 0, Bit M (I/G) = 0
+	Được sử dụng làm địa chỉ MAC.
+EUI-64:
+	Cấu trúc tương tự như EUI-48.
+	Assign extension = 64 - số bit base
+
+MAC-48:
+	Hiện đã lỗi thời
+	Được tạo bằng IAB được thay thế bằng OUI-36(MA-S).
+	Được dùng là địa chỉ MAC-48 sử dụng để định danh phần cứng.
+	* Ban đầu EUI-48 không sử dụng cho phần cứng, nó chỉ sử dụng cho phần mềm, protocol,...

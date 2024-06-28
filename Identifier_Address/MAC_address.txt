@@ -1,0 +1,43 @@
+Chú thích:
+EUI: Extend Unique Identifier
+OUI: Organizationally Unique Identifier
+IAB: Individual Address Blocks 
+EUI-X: X là số -> EUI 48 bits
+Định nghĩa EUI, OUI, IAB xem ./EUI.txt
+
+MAC (Media access control) address:
+	Độ dài 48 bits hay là 6 octets
+	Định danh cho physical (do nhà sản xuất cấp, có thể thay đổi nhưng không nên)
+	Được hình thành dựa trên EUI-48 và MAC-48
+	Tuy nhiên MAC-48 đã lỗi thời, và không còn đăng kí được nữa
+	Cấu thành từ 2 phần: base và extension. Phần base là định danh tổ chức (hoặc không) 
+còn extension là phần định danh sản phẩm.
+	Có 3 loại được IEEE RA lưu trữ:
+		MA-L, MA-M, MA-S
+	Phần base được đăng kí phẩn biến hiện tại là OUI-48
+	Ngoài ra còn có Local MAC address theo chuẩn SLAP (Structed Local Address Plan) 
+của IEEE802.
+
+IANA OUI: 00-00-5E
+	Được dùng để tạo EUI dành cho các protocol.
+	
+MAC (EUI-48) được tạo từ IANA OUI:
+	Unicast:
+		00-00-5E-00-00-00 đến 00-00-5E-00-00-FF: đăng kí với yêu cầu IESG Ratification
+		00-00-5E-00-01-00 đến 00-00-5E-00-01-FF: VRRP
+		00-00-5E-00-02-00 đến 00-00-5E-00-02-FF: IPv6 VRRP
+		00-00-5E-00-52-00 đến 00-00-5E-00-52-FF: đăng kí nhỏ khác.
+		00-00-5E-00-53-00 đến 00-00-5E-00-53-FF: tài liệu.
+	Multicast:
+		01-00-5E-00-00-00 đến 01-00-5E-7F-FF-FF: IPv4 multicast
+		01-00-5E-80-00-00 đến 01-00-5E-8F-FF-FF: MPLS multicast
+		01-00-5E-90-00-00 đến 01-00-5E-90-00-FF: đăng kí nhỏ khác.
+		01-00-5E-90-10-00 đến 01-00-5E-90-10-FF: tài liệu.
+
+*** Modified EUI-64:
+	MAC address:
+	|	0	|	1	|	2	|	3	|	4	|	5	|	6	|
+	|	|X|0|		|		|		|		|		|		|
+-> Cấu trúc của Modified EUI-64:
+		0		1	<----Append----->	2		3		4		5		6
+	|	|1|M|		|	FF	|	FE	| 		|		|		|		|		|

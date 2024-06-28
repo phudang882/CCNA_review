@@ -1,0 +1,26 @@
+NAT:
+	Nat (Network Address Translation) tức là một công nghệ thực hiện 2 nhiệm vụ:
+		Chuyển src address thành public address (hoặc external address)
+		Dịch dst address thành private address (hoặc internal address)
+	Chuyển src address sẽ dùng 1 bảng NAT table chứa các địa chỉ để NAT.
+NAT có 2 loại là:
+	Static: Chỉ duy nhất 1 địa chỉ được ánh xạ sang 1 địa chỉ public(dành cho server).
+	Dynamic pool: Một nhóm địa chỉ được ánh xạ sang 1 nhóm địa chỉ public(không còn dùng) 
+	Dynamic port: Tất cả địa chỉ sẽ được ánh xạ sang 1 địa chỉ public và với mỗi địa chỉ sẽ tương
+			ứng với 1 port.
+---Các Bước Config NAT---
+NAT trên Cisco Router:
+	B1: Khai báo interface nào inside outside
+	B1.extend: Khai báo ACL nhóm các địa chỉ cần NAT
+	B2: Khai báo NAT table:
+		Có thể là inside hoặc outside.
+		Địa chỉ private: Có thể là host hoặc ACL 
+		Địa chỉ public:
+			Static: địa chỉ này không được thiết bị nào sử dụng kể cả cái port của router
+			Dynamic port: địa chỉ này chính là ip của port outside của router
+NAT trên Cisco ASA:
+	B1: Khai báo inside outside
+	B2: Khai báo object network để NAT:
+		Khai báo địa chỉ gốc cần nat
+		Khai báo nat động hay tĩnh
+	

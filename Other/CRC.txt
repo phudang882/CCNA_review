@@ -1,0 +1,8 @@
+CRC (Cyclic Redundancy Check) là hàm kiểm tra lỗi checksum trong việc truyền dữ 
+liệu.
+Các loại CRC thường được dùng là:
+- CRC-32
+- CRC-CCITT (Consultative Committee for International Telegraph and Telephone)
+- CRC-16
+Cơ chế: Dữ liêu sẽ chuyễn sang dạng số và được nhân cho một số (số kiểm lỗi) sau 
+đó modulo cho 2^số bit (ví dụ CRC-32 là 2^32).

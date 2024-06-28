@@ -1,0 +1,8 @@
+en
+conf t
+	int fa0/0
+	ip address 192.168.1.2 255.255.255.0
+	standby 11(group number) ip 192.168.1.1 (virtual ip)
+	standby 11 track fa0/0 (track trên cổng)
+	standby version 2 (version 2 sẽ có những điểm khác với version 1)
+	

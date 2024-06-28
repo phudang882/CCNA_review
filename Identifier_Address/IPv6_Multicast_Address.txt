@@ -1,0 +1,103 @@
+Cấu trúc của IPv6 Multicast address:
+
+	|   8    |  4 |  4 |                  112 bits                    |
+	+------ -+----+----+----------------------------------------------+
+	|11111111|ff1 |scop|                  ????????                    |
+	+--------+----+----+----------------------------------------------+
+				|    
+			____V____ 												 	
+			|X|Y|P|T| 				
+			^^^^^^^^^			
+	Ý nghĩa của scop là multicast thuộc loại địa chỉ tầm vực nào
+			(RFC 7346(PD): IPv6 Multicast Address Scopes)
+		+------+--------------------------+-------------------------+
+		| scop | NAME                     | REFERENCE               |
+		+------+--------------------------+-------------------------+
+		|  0   | Reserved                 | [RFC4291], RFC 7346     |
+		|  1   | Interface-Local scope    | [RFC4291], RFC 7346     |
+		|  2   | Link-Local scope         | [RFC4291], RFC 7346     |
+		|  3   | Realm-Local scope        | [RFC4291], RFC 7346     |
+		|  4   | Admin-Local scope        | [RFC4291], RFC 7346     |
+		|  5   | Site-Local scope         | [RFC4291], RFC 7346     |
+		|  6   | Unassigned               |                         |
+		|  7   | Unassigned               |                         |
+		|  8   | Organization-Local scope | [RFC4291], RFC 7346     |
+		|  9   | Unassigned               |                         |
+		|  A   | Unassigned               |                         |
+		|  B   | Unassigned               |                         |
+		|  C   | Unassigned               |                         |
+		|  D   | Unassigned               |                         |
+		|  E   | Global scope             | [RFC4291], RFC 7346     |
+		|  F   | Reserved                 | [RFC4291], RFC 7346     |
+		+------+--------------------------+-------------------------+
+
+	Với X: dành cho định nghĩa tương lai hiện tại 1 hoặc 0 đều được.				  	
+	Với T (RFC 4291):
+		T = 0: địa chỉ này là vĩnh viễn (well-know) được đăng kí bởi IANA.
+		T = 1: địa chỉ này là không vĩnh viễn người dùng tự tạo và sử dụng.
+		
+	Với R (RFC 3956):
+		R = 0: Địa chỉ này không nằm trên Rendezvous Point.
+		R = 1: Địa chỉ này nằm trên Rendezvous Point (điểm cung cấp dịch vụ multicast)
+			Nếu R = 1 -> P = 1 -> T = 1
+			** ../Casting/ASM.txt
+	Với P:															  	
+		P = 0 (RFC 2373): địa chỉ "không" dựa trên 1 network prefix.
+		P = 1 (RFC 3956): địa chỉ dựa vào trên 1 network prefix.
+			P = 1 -> T = 1: dựa trên 1 network prefix thì không thể nào được đăng 
+		kí bởi IANA nên T phải bằng 1.
+		
+------------------------
+	- Với P = 0, hiện tại được định nghĩa ff1 = "000T":
+		|   8    |  4 |  4 |                  112 bits                    |		
+		+------ -+----+----+----------------------------------------------+		
+		|11111111|000T|scop|                  group ID                    |		
+		+--------+----+----+----------------------------------------------+
+		Vậy IANA sử dụng ff00::/16 để đăng kí những multicast address đặc biệt.
+		Còn ff01::/16 để tự người dùng định nghĩa.
+------------------
+	* Ngoài P = 0 thì cấu trúc của địa chỉ có dạng:
+		|   8    |  4 |  4 |  4 |  4 |    8   |       64       |    32    |		
+		+--------+----+----+----+----+--------+----------------+----------+		
+		|11111111|ff1 |scop|ff2 |RIID|  plen  | network prefix | group ID |		
+		+--------+----+----+----+----+--------+----------------+----------+	
+	
+		ff2: |r|r|r|r|
+			Được định nghĩa trong tương lai, hiện tại "phải" gán là 0.
+---------------------
+	- ff1 = "0011" (RFC 3306): X = 0, Y = 0, P = 1, T = 1
+		Địa chỉ Source-Specific Multicast (SSM)
+			SSM là một dịch vụ multicast được định nghĩa trong RFC 4607.
+			SSM hỗ trợ one-to-many.
+		|   8    |  4 |  4 |  4 |  4 |    8   |       64       |    32    |		
+		+--------+----+----+----+----+--------+----------------+----------+		
+		|11111111|0011|scop|ff2	|  0 |    0   |		   0	   | group ID |		
+		+--------+----+----+----+----+--------+----------------+----------+	
+		plen = 0, network prefix = 0.
+		RIID = 0 (nó lại định nghĩa trong RFC 3956).
+		Vậy SSM address được tạo ra từ ff3[scop]::/92.
+		Tuy nhiên ta vẫn xem các địa chỉ thuộc mạng ff3[scop]::/32 là SSM address.
+		
+		**RFC 7371 dạng ffb[scop]::/92 (X = 1) hay ffb[scop]::/32 là SSM address**
+---------------------------
+	- ff1 = "0111" (RFC 3956): X = 0, Y = 1, P = 1, T = 1
+		Địa chỉ Embedded-RP (Rendezvous Point).
+		
+		|   8    |  4 |  4 |  4 |  4 |    8   |       64       |    32    |		
+		+--------+----+----+----+----+--------+----------------+----------+		
+		|11111111|0111|scop|ff2 |RIID|  plen  | network prefix | group ID |		
+		+--------+----+----+----+----+--------+----------------+----------+
+			
+		plen: Khác 0 Khác SSM (Source Specific Multicast) và bé hơn bằng 64.			
+		Các Rendezvous Point lấy địa chỉ multicast address bằng cách sau:
+			Cắt plen bits network prefix thêm 0 bit sao cho được 128 bits.
+			Thay thế các bit cuối bằng RIID.
+		+-----------plen bit----------+------------------------------+--4-+
+		| 		cutted network pre	  |000000000000000000000000000000|RIID|
+		+-----------------------------+------------------------------+----+
+		-> RIID không thể bằng 0 để tránh với anycast.
+		**RFC 7371 định nghĩa thêm fff0::/12 (X = 1) vẫn là Embedded-RP**
+		
+Tổng hợp Multicast address:
+	* https://www.iana.org/assignments/ipv6-multicast-addresses/ipv6-multicast-addresses.xhtml
+	* iana-ipv6-multicast-addresses.txt

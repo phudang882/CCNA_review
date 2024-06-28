@@ -1,0 +1,39 @@
+Kĩ thuật sliding window: (Đa số là ở tầng transport)
+- WS: window side số gói được gửi đi cùng lúc
+- Ở máy gửi:
+	+ 1 biến local: Lsend (đại diện các gói đã gửi + 1 trừ gói đầu)
+	+ 1 biến tuần tự của máy nhận gửi: Nreceive
+	+ 1 biến dữ liệu: data
+- Ở máy gửi:
+	+ 1 biến local: Lreceive (đại diện cho các gói hiện tại muốn nhận)
+	+ biến tuàn tự của máy phát gửi: Nsend
+Quá trình như sau:
+	Trước khi giao tiếp:
+		Lsend = 0, Lreceive = 0;
+		Nsend = 0 ở
+		Data đến quá trình gửi.
+		Socket máy nhận gửi luôn thực hiện lệnh Listen
+	Trong khi giao tiếp:
+		Máy gửi:
+			Send(data, Lreceive)
+	....	Header -> Header.append(Lreceive) ....
+			Lsend ++
+		Máy nhận:
+	....	Socket Listen một gói đến      ....
+	....   	Header.Nsend == Lreceive => (1) else (2)
+			(1) Lreceive ++ ;
+				ACK(Lreceive): gửi gói ACK Lreceive
+					(Thông báo gói Lreceive - 1 cần gói tiếp theo)
+				=> Lreceive -> Nreceive
+			(2) Tùy giải thuật sẽ có nhưng cách khác nhau.
+		Máy gửi nhận ACK:
+			Send(Data,ACK.Nreceive);
+			ACK.Nreceive == Lsend => Lsend ++;
+		Máy gửi không nhận được ACK:
+			Tùy vào giải thuật
+		
+		
+		
+
+			
+	

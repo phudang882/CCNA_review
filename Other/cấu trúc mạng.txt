@@ -1,0 +1,27 @@
+Cấu trúc mạng internet: 
+	- ISP (Internet Service Provider)có tier cấp độ:
+		1. Quốc gia (global ISP)
+		2. Phụ thuộc vào 1 (regional ISP)
+		3. Phụ thuộc vào 1,2 và local ISP (access ISP)
+	- IXP (Internet exchange Point), PoP
+	- CPN (Content Provider Network)
+	- End Device
+	
+Topology:
+	Hình sao (Star):
+	Vòng (Ring): -> Token-Ring
+	Trục (Bus): -> Token-Bus
+Mô hình truyền thông:
+	- Chuyển mạch gồm:
+		+ Chuyển mạch kênh Circuit
+		+ Chuyển mạch gói Packet
+			* có Hướng liên kết (orial connection,virtual circuit)
+			* không liên kết (connectionless, datagram)
+	- Chế độ kết nối:
+		+ Kết nối điểm - điểm: unicast
+		+ Kết nôi đa điểm:
+			* multicast: kết nối giữa 1 và nhiều máy trong 1 mạng
+			* broadcast: kết nối giữa 1 và tất cả các máy trong 1 mạng
+Protocol: các ngôn ngữ giao tiếp giữa các thiết bị mạng.
+Địa chỉ: muốn giao tiếp phải biết đến địa chỉ của phía còn lại.
+	=> Địa chỉ Mac, IPv4, IPv6.

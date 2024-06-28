@@ -1,0 +1,22 @@
+1. Cấu hình địa chỉ IP cho các thiết bị như thể hiện trong sơ đồ. 
+2. Trunk: Thiết lập trunk sử dụng kiểu đóng gói dot1q trên các đường liên kết thể hiện như trong sơ đồ. 
+3. VTP: Thiết lập VTP trên các Switch DS1, DS2, Sw1, Sw2 sử dụng domain cisco123 với DS1 & DS2 đóng vai trò là Server, Sw1 & Sw2 đóng vai trò Client học thông tin VLAN từ Server Switch. 
+4. VLAN: 
+a. Tạo VLAN 10 trên DS1 đảm bảo Sw1 học được thông tin VLAN này.
+b. Tạo VLAN 20 trên DS2 đảm bảo Sw2 học được thông tin VLAN này.
+5. InterVLAN: Tiến hành tạo các sub-interface trên R3 đảm bảo các PC thuộc VLAN3 có thể giao tiếp được với các PC thuộc VLAN 4.
+6. OSPF: 
+a. Cấu hình OSPF trên các thiết bị R1, R2, DS1, DS2, S1 đảm bảo mạng hội tụ.
+b. Thiết lập Router-id trên các thiết bị lần lượt như sau:
+i. R1 có router-id là 0. 0. 0. 1
+ii. R2 có router-id là 0. 0. 0. 2
+iii. DS1 có router-id là 0. 0. 0 .3
+iv. DS2 có router-id là 0. 0. 0 .4
+v. S1 có router-id là 0. 0. 0 .5
+c. Cấu hình trên R1 và R2 quảng báo default-route vào miền OSPF.
+7. DHCP: Cấu hình DHCP trên Switch S1 cấp IP xuống cho các PC thuộc VLAN 10 và VLAN 20. 
+8. NAT: Cấu hình NAT trên R1, R2, R3 đảm bảo các thiết bị mạng nội bộ có thể truy cập internet. 
+9. VPN: Thiết lập GRE VPN trên R1, R2, R3 đảm bảo các thiết bị PC3, PC4 có thể truy cập tới Server thông qua 2 hướng. 
+10. ACL:
+a. Cấu hình ACL trên R3 sao cho các PC thuộc lớp mạng 10 .0.30.0 /24 & 10 .0.40.0/24 chỉ có thể truy cập tới Server, không truy cập được internet. 
+b. Cấu hình ACL trên DS1, DS2 sao cho Server có thể ping được tới các PC nhưng các PC không thể ping được tới Server.

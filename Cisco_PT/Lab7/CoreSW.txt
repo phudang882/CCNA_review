@@ -1,0 +1,313 @@
+tạo các vlan: (1 loop tương đươc 1 với 1 lớp mạng và gần với 1 vlan tạo loop cho tiện)
+
+
+CoreS1:
+en
+conf t
+vlan 40
+exit
+host CoreS1
+
+int loop 10
+ ip add 10.1.10.1 255.255.255.0
+int loop 20
+ ip add 10.1.20.1 255.255.255.0
+int loop 30
+ ip add 10.1.30.1 255.255.255.0
+int vlan 40
+ ip add 10.1.40.1 255.255.255.0
+ no shut
+
+int range g0/0-1
+ sw acc vlan 40
+ sw mode acc
+ no shut
+no ip cef
+ip routing
+ip route 0.0.0.0 0.0.0.0 10.1.40.254
+router ospf 1
+net 10.0.0.0 0.255.255.255 area 0
+exit
+
+int loop 1
+ ip add 10.1.1.1 255.255.255.0 
+int loop 2
+ ip add 10.1.2.1 255.255.255.0
+no access-list 1
+access-list 1 permit host 10.1.1.1
+route-map PRM permit 30
+	match ip add 1
+	set ip next-hop 10.1.40.2
+	exit
+no access-list 2
+access-list 2 permit host 10.1.2.1
+route-map PRM permit 40
+	match ip add 2
+	set ip next-hop 10.1.40.3
+	exit
+no ip sla schedule 1 life forever start now
+no ip sla 1
+ip sla 1
+	icmp-echo 8.8.8.8 source-interface loopback 1
+		frequency 10
+		timeout 6000
+		exit
+ip sla schedule 1 life forever start now
+no ip sla schedule 2 life forever start now
+no ip sla 2
+ip sla 2
+	icmp-echo 8.8.8.8 source-interface loopback 2
+		frequency 10
+		timeout 6000
+		exit
+ip sla schedule 2 life forever start now
+track 1 ip sla 1 reachability
+track 2 ip sla 2 reachability
+no access-list 10
+no access-list 20
+access-list 10 permit 10.1.10.0 0.0.0.255
+access-list 10 permit 10.1.20.0 0.0.0.255
+access-list 20 permit 10.1.30.0 0.0.0.255
+route-map PRM permit 10
+	match ip add 10
+	set ip next-hop verify-availability 10.1.40.2 1 track 1
+	set ip next-hop verify-availability 10.1.40.3 2 track 2
+	exit
+route-map PRM permit 20
+	match ip add 20
+	set ip next-hop verify-availability 10.1.40.3 1 track 2
+	set ip next-hop verify-availability 10.1.40.2 2 track 1
+	exit
+ip local policy route-map PRM
+---------
+CoreS2:
+en
+conf t
+vlan 40
+exit
+host CoreS1
+
+int loop 10
+ ip add 10.2.10.1 255.255.255.0
+int loop 20
+ ip add 10.2.20.1 255.255.255.0
+int loop 30
+ ip add 10.2.30.1 255.255.255.0
+int vlan 40
+ ip add 10.2.40.1 255.255.255.0
+ no shut
+int range g0/0-1
+ sw acc vlan 40
+ sw mode acc
+ no shut
+no ip cef
+ip routing
+ip route 0.0.0.0 0.0.0.0 10.2.40.254
+router ospf 1
+net 10.0.0.0 0.255.255.255 area 0
+exit
+
+int loop 1
+ ip add 10.2.1.1 255.255.255.0 
+int loop 2
+ ip add 10.2.2.1 255.255.255.0
+
+access-list 1 permit 10.2.1.1 0.0.0.0 
+route-map PRM permit 30
+match ip add 1
+set ip next-hop 10.2.40.2
+exit
+access-list 2 permit 10.2.2.1 0.0.0.0 
+route-map PRM permit 40
+match ip add 2
+set ip next-hop 10.2.40.3
+exit
+ip sla 1
+	icmp-echo 8.8.8.8 source-interface loopback 1
+		frequency 10
+		timeout 6000
+		exit
+ip sla schedule 1 life forever start now
+
+ip sla 2
+	icmp-echo 8.8.8.8 source-interface loopback 2
+		frequency 10
+		timeout 6000
+		exit
+ip sla schedule 2 life forever start now
+track 1 ip sla 1 reachability
+track 2 ip sla 2 reachability
+no access-list 10
+no access-list 20
+access-list 10 permit 10.2.10.0 0.0.0.255
+access-list 10 permit 10.2.20.0 0.0.0.255
+access-list 20 permit 10.2.30.0 0.0.0.255
+route-map PRM permit 10
+	match ip add 10
+	set ip next-hop verify-availability 10.2.40.2 1 track 1
+	set ip next-hop verify-availability 10.2.40.3 2 track 2
+	exit
+route-map PRM permit 20
+	match ip add 20
+	set ip next-hop verify-availability 10.2.40.3 1 track 2
+	set ip next-hop verify-availability 10.2.40.2 2 track 1
+	exit
+ip local policy route-map PRM
+----
+CoreS3:
+en
+conf t
+vlan 40
+exit
+host CoreS1
+
+int loop 10
+ ip add 10.3.10.1 255.255.255.0
+int loop 20
+ ip add 10.3.20.1 255.255.255.0
+int loop 30
+ ip add 10.3.30.1 255.255.255.0
+int vlan 40
+ ip add 10.3.40.1 255.255.255.0
+ no shut
+int range g0/0-1
+ sw acc vlan 40
+ sw mode acc
+ no shut
+no ip cef
+ip routing
+ip route 0.0.0.0 0.0.0.0 10.3.40.254
+router ospf 1
+net 10.0.0.0 0.255.255.255 area 0
+exit
+int loop 1
+ ip add 10.3.1.1 255.255.255.0 
+int loop 2
+ ip add 10.3.2.1 255.255.255.0
+
+ip sla 1
+	icmp-echo 8.8.8.8 source-interface loopback 1
+		frequency 10
+		timeout 6000
+		exit
+ip sla schedule 1 life forever start now
+
+ip sla 2
+	icmp-echo 8.8.8.8 source-interface loopback 2
+		frequency 10
+		timeout 6000
+		exit
+ip sla schedule 2 life forever start now
+track 1 ip sla 1 reachability
+track 2 ip sla 2 reachability
+no access-list 10
+no access-list 20
+access-list 10 permit 10.3.10.0 0.0.0.255
+access-list 10 permit 10.3.20.0 0.0.0.255
+access-list 20 permit 10.3.30.0 0.0.0.255
+route-map PRM permit 10
+	match ip add 10
+	set ip next-hop verify-availability 10.3.40.2 1 track 1
+	set ip next-hop verify-availability 10.3.40.3 2 track 2
+	exit
+route-map PRM permit 20
+	match ip add 20
+	set ip next-hop verify-availability 10.3.40.3 1 track 2
+	set ip next-hop verify-availability 10.3.40.2 2 track 1
+	exit
+access-list 1 permit 10.3.1.1 0.0.0.0 
+route-map PRM permit 30
+match ip add 1
+set ip next-hop 10.3.40.2
+exit
+access-list 2 permit 10.3.2.1 0.0.0.0 
+route-map PRM permit 40
+match ip add 2
+set ip next-hop 10.3.40.3
+exit
+ip local policy route-map PRM
+
+------
+CoreS4:
+en
+conf t
+vlan 40
+exit
+host CoreS4
+
+int loop 10
+ ip add 10.4.10.1 255.255.255.0
+int loop 20
+ ip add 10.4.20.1 255.255.255.0
+int loop 30
+ ip add 10.4.30.1 255.255.255.0
+int vlan 40
+ ip add 10.4.40.1 255.255.255.0
+ no shut
+int range g0/0-1
+ sw acc vlan 40
+ sw mode acc
+ no shut
+no ip cef
+ip routing
+ip route 0.0.0.0 0.0.0.0 10.4.40.254
+router ospf 1
+net 10.0.0.0 0.255.255.255 area 0
+net 192.168.0.0 0.0.255.255 area 0
+exit
+
+int loop 1
+ ip add 10.4.1.1 255.255.255.0 
+int loop 2
+ ip add 10.4.2.1 255.255.255.0
+ 
+
+ip sla 1
+	icmp-echo 8.8.8.8 source-interface loopback 1
+		frequency 10
+		timeout 6000
+		exit
+ip sla schedule 1 life forever start now
+
+ip sla 2
+	icmp-echo 8.8.8.8 source-interface loopback 2
+		frequency 10
+		timeout 6000
+		exit
+ip sla schedule 2 life forever start now
+
+track 1 ip sla 1 reachability
+track 2 ip sla 2 reachability
+no access-list 10
+no access-list 20
+access-list 10 permit 10.4.10.0 0.0.0.255
+access-list 10 permit 10.4.20.0 0.0.0.255
+access-list 20 permit 10.4.30.0 0.0.0.255
+no route-map PRM
+route-map PRM permit 10
+	match ip add 10
+	set ip next-hop verify-availability 10.4.40.2 1 track 1
+	set ip next-hop verify-availability 10.4.40.3 2 track 2
+	exit
+route-map PRM permit 20
+	match ip add 20
+	set ip next-hop verify-availability 10.4.40.3 1 track 2
+	set ip next-hop verify-availability 10.4.40.2 2 track 1
+	exit
+
+access-list 1 permit host 10.4.1.1
+route-map PRM permit 30
+match ip add 1
+set ip next-hop 10.4.40.2
+exit
+access-list 2 permit host 10.4.2.1
+route-map PRM permit 40
+match ip add 2
+set ip next-hop 10.4.40.3
+exit
+ip local policy route-map PRM
+
+no route-map TEST1
+no route-map TEST2
+
+route add 131.226.217.48 mask 255.255.255.0 10.1.19.2

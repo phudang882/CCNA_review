@@ -1,0 +1,115 @@
+IPv6 address: Địa chỉ ipv6 là địa chỉ gồm 128 bits được sử dụng gói IPv6
+- Unicast: đại diện cho 1 interface (cổng kết nối, cổng giao tiếp).
+- Anycast: đại diện 1 nhóm nhưng gói tin gửi đến 1 interface gần nhất.
+	Anycast thường đại diện cho một nhóm router.
+	Đặc biệt trên interface không thể có unicast address.
+- Multicast: đại diện 1 nhóm, gói tin gửi đến tất cả các interface.
+* Trong giao thức không có Broadcast bởi Broadcast được thiết kế trong Multicast.
+* IPv6 address sử dụng CIDR giống với IPv4 address.
+
+Tính chất đặc biệt của địa chỉ IPv6:
+	Số lượng địa chỉ IP lớn.
+	Được thiết kế để đơn nhất trên thế giới dù là chỉ sử dụng trên nội bộ.
+	Hỗ trợ phân các phân chia các địa chỉ.
+	Hỗ trợ bảo mật địa chỉ IP, chống address scanning.
+
+Cấu trúc của IPv6 address:
+	|<---------------------------128 bits-------------------------->|
+	|		 subnet prefix			|			suffix				|
+	^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+	Biểu diễn dưới dạng số:
+	address <- X ':' X ':' X ':' X ':' X ':' X ':' X ':' X
+	Với X ứng với 2 octet (16-bit) tương ứng 4 chữ số thập lục phân.
+
+	Viết dưới dạng rút gọn: lượt bỏ các thành phần 0 "liên tiếp" bằng '::'.
+		'::' chỉ xuất hiện 1 lần.
+		Lượt bỏ tối đa nhất có thể, nếu bằng nhau lượt bỏ dãy 0 liên tiếp đầu.
+		Ví dụ 2001:DB8:0:0:8:800:200C:417A -> 2001:DB8::8:800:200C:417A.
+	Viết dưới dạng IPv4 kết hợp IPv6:
+		<Prefix>:v4.v4.v4.v4
+	IPv6 address prefix (CIDR): như bên IPv4, tất cả các địa chỉ cuối bằng 0
+		2001:0db8:0000:cd30:0000:0000:0000:0000/60
+		2001:0db8::cd30:0:0:0:0/60
+		2001:0db8:0:cd30::/60
+	Cách biểu diễn một 1 node trên 1 subnet tương tự với IPv4
+	Sau khi sửa đổi ở RFC 5952:
+		**Tất cả địa chỉ chữ (ví dụ "a", "b") "phải được viết chữ thường.**
+		**Sử dụng [IPv6 address]:Port number **
+		
+Cấu trúc của IPv6 Unicast address:
+	|<------------n---------------->|
+	|			Prefix Unicast		|			Interface ID		 |
+	^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+	Prefix bắt đầu khác 000
+		Interface ID: Modified EUI-64 (không bắt buộc)
+		* Dẫn đến vấn đề bảo mật nên đang trong quá trình thay đổi.
+		Với Prefix này IETF đã chia một phần nó cho nội bộ.
+		Phần còn lại thì đang trong quá trình định nghĩa.
+	Prefix bắt đầu bằng 000.
+		Với Prefix này 0000 được khai thác một phần vì một số mục đích đặc biệt.
+	- Global Unicast prefix:
+		2000::/3
+	* IPv6_Unicast_Address.txt
+	
+Cấu trúc của IPv6 Anycast address:
+	|<---------------------n bits------------------>|
+	|                  subnet prefix                | 00000000000000 |
+	^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+	subnet prefix = prefix unicast
+	Ngoài ra còn 1 loại Anycast nữa:
+		RFC 2526(PD): Reserved IPv6 Subnet Anycast Addresses
+	
+Cấu trúc của IPv6 Multicast address:
+	|   8    |  4 |  4 |                  112 bits                   |
+	+------ -+----+----+---------------------------------------------+
+	|11111111|flgs|scop|               	  suffix                   	 |
+	+--------+----+----+---------------------------------------------+
+	ff00::/8
+	* IPv6_Multicast_Address.txt
+
+
+	
+IANA Internet Protocol Version 6 Address Space:	
+	https://www.iana.org/assignments/ipv6-address-space/ipv6-address-space.xhtml
+
+Tổng hợp các prefix đặc biệt đã và đang sử dụng:
+	https://www.iana.org/assignments/iana-ipv6-special-registry/iana-ipv6-special-registry.xhtml
+
+Tổn hợp multicast address:
+	https://www.iana.org/assignments/ipv6-multicast-addresses/ipv6-multicast-addresses.xhtml
+
+
+
+RFC 7721(INFOR): Security and Privacy Considerations for
+                   IPv6 Address Generation Mechanisms
+	https://datatracker.ietf.org/doc/html/rfc7721
+RFC 7136(PD): Significance of IPv6 Interface Identifiers
+	https://datatracker.ietf.org/doc/html/rfc7136
+	
+RFC 6177(BCP): IPv6 Address Assignment to End Sites
+RFC 4291(DD): IP Version 6 Addressing Architecture
+RFC 4862(DD): IPv6 Stateless Address Autoconfiguration
+RFC 2526(PD): Reserved IPv6 Subnet Anycast Addresses
+RFC 4007(PD): IPv6 Scoped Address Architecture
+RFC 4193(PD): Unique Local IPv6 Unicast Addresses
+RFC 4489(PD): A Method for Generating Link-Scoped IPv6 Multicast Addresses
+RFC 5701(PD): IPv6 Address Specific BGP Extended Community Attribute
+RFC 5453(PD): Reserved IPv6 Interface Identifiers
+RFC 5952(PD): A Recommendation for IPv6 Address Text Representation
+RFC 7217(PD): A Method for Generating Semantically Opaque Interface Identifiers
+					with IPv6 Stateless Address Autoconfiguration (SLAAC)
+RFC 8981(PD): Temporary Address Extensions for Stateless Address Autoconfiguration 
+									in IPv6
+RFC 6724(PD): Default Address Selection for Internet Protocol Version 6 (IPv6)
+RFC 6052(PD): IPv6 Addressing of IPv4/IPv6 Translators
+RFC 3306(PD): Unicast-Prefix-based IPv6 Multicast Addresses	
+RFC 3307(PD): Allocation Guidelines for IPv6 Multicast Addresses	
+RFC 3956(PD): Embedding the Rendezvous Point (RP) Address in an IPv6 Multicast Address	
+RFC 6515(PD): IPv4 and IPv6 Infrastructure Addresses in BGP Updates for Multicast VPN
+RFC 6874(PD): Representing IPv6 Zone Identifiers in Address Literals and Uniform 
+								Resource Identifiers
+RFC 7346(PD): IPv6 Multicast Address Scopes
+RFC 7371(PD): Updates to the IPv6 Multicast Addressing Architecture
+RFC 9164(PD): Concise Binary Object Representation (CBOR) Tags for IPv4 and 
+							IPv6 Addresses and Prefixes
+RFC 8415(PD): Dynamic Host Configuration Protocol for IPv6 (DHCPv6)

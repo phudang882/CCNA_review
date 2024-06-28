@@ -1,0 +1,563 @@
+#!/bin/bash
+
+################################################################
+###################### Author: Luu Huynh ######################
+################################################################
+######################## Rules of Usage ########################
+#                                                              #
+#    This toolkit allows any individual, training center, and  #
+# organization to be propagated and redeveloped in any form .  #
+# The only condition is to mark the original author            #
+#  "Asd&Maosen@EmulatedLab" on user interface.                 #
+#                                                              #
+#                          @C500EmulatedLab                       #
+################################################################
+
+VERSION=20180407
+#pwd=`dirname $0`
+pwd=/usr/share/eve-ng-toolkit
+while (true)
+do
+e=0
+    clear
+    echo "******************************************************"
+    echo "*******************EVE-NG Toolkit*********************"
+    echo "******************************************************"
+    echo -e "**                \033[31m@C500EmulatedLab\033[0m                   **"
+    echo "**                                                  **"
+    echo "**        0. IP address management                  **"
+    echo "**        1. Hide invalid device*                   **"
+    echo "**        2. Modify update Source                   **"
+    echo "**        3. Update & Upgrade                       **"
+    echo "**        4. Generate IOU License                   **"
+    echo "**        5. Fixpermissions                         **"
+    echo "**        6. Add H3C Device Support*                **"
+    echo "**        7. Add Hillstone Device Support*          **"
+    echo "**        8. Add Radware Device Support*            **"
+    echo "**        9. Add Zabbix/Nagios Device Support*      **"
+    echo "**        10.Add VMware ESXi Device Support*        **"
+    echo "**        11.Add Storage Device Support*            **"
+    echo "**        12.Add Software Router Device Support*    **"
+    echo "**        13.Add Openstack/Docker Device Support*   **"
+    echo "**        14.Add Android Device Support*            **"
+    echo "**        15.Add Configuration Management*          **"
+    echo "**        d. Diagnose info                          **"
+    echo "**        p. Eve-ng Pro evaluation*                 **"
+    echo "**        u. Update Toolkit                         **"
+    echo "**        e. Exit                                   **"
+    echo "**                                                  **"
+    echo "******************************************************"
+    echo "*********************V."$VERSION"***********************"
+    echo "******************************************************"
+    read -p "press number, then press Enter :" KEY
+    res="./res"
+    html="/opt/unetlab/html"
+    script="/opt/unetlab/scripts"
+    icon="/opt/unetlab/html/images/icons"
+    include="/opt/unetlab/html/includes"
+    template="/opt/unetlab/html/templates" 
+    
+    sed -i '/EVE-NG Toolkit/d;/eveversion/a\<p class="login-box-msg" style="text-align:center; color:white">EVE-NG Toolkit '$VERSION'</p>\' /opt/unetlab/html/themes/adminLTE/unl_data/pages/login.html
+    sed -i '/EmulatedLab/d;/login-box-body /a\<p class="login-box-msg" style="text-align:center; color:white">EVE-NG Toolkit Powered By EmulatedLab(593920308)</p>\' /opt/unetlab/html/themes/adminLTE/unl_data/pages/login.html
+    sed -i '/Toolkit/d;/versiondata/a\<p class="text-muted">Toolkit version: '$VERSION'</p>\' /opt/unetlab/html/themes/adminLTE/unl_data/pages/sysstat.html 
+    sed -i "/Toolkit version/d;/\$statusModalBody).append('<li>' + MESSAGES\[39\]/a\\\t\$('#stats-text ul', \$statusModalBody).append('<li>Toolkit version: <code>"$VERSION"</code></li>');" /opt/unetlab/html/themes/default/js/functions.js
+    if [ -e eve_ng_toolkit.tgz ];then
+	rm eve_ng_toolkit.tgz
+    fi	
+ numreg="^[0-9]+$"
+ if [[ "$KEY" =~ $numreg ]]; then
+  #if [ $KEY -eq 666 ]; then
+   # KEY="1 2 6 7 8 9 11 12 13 14 3 4 5 10 u";
+  #fi
+  if (([ $KEY -eq 1 ])||([ $KEY -ge 6 ]&&[ $KEY -le 15 ]))&&([ "`awk -F'-' '{print $3}' /opt/unetlab/html/themes/adminLTE/VERSION`" == "PRO" ]);
+   then
+	if [ ! -e $include/config.php ];then 
+		cp /opt/unetlab/html/includes/config.php{.distribution,}
+		sed -i "s/\/\/\s\s\s\$custom_templates/\t\$custom_templates/g" $include/config.php
+		sed -i "s/\/\/\s\s\s)/\t)/g" $include/config.php
+	fi
+	if (([ $KEY -eq 1 ])||([ $KEY -eq 6 ])||([ $KEY -eq 7 ]));then
+      		KEY="$KEY"p;
+	else
+		KEY=100;
+	fi
+  fi
+ fi
+ for KEY in $KEY;do
+    case $KEY in
+    0)
+        clear
+        while (true); do
+            echo "******************************************************"
+            echo "*********************EVE-NG Toolkit*******************"
+            echo "******************************************************"
+            echo "**                                                  **"
+            echo "**                     0.DHCP                       **"
+            echo "**                     1.Static                     **"
+            echo "**                                                  **"
+            echo "******************************************************"
+	    echo "**********************V."$VERSION"**********************"
+            echo "******************************************************"
+            read -p "press number ,then press Enter :" ovf_dhcp
+            if [ -n "$ovf_dhcp" ]; then
+                # if $ovf_dhcp unset or any other key exit
+                # if [ "$ovf_dhcp" != 0 ]| "$ovf_dhcp" != 1 ]; then
+                #    break
+                # fi
+                
+                if [ "$ovf_dhcp" == 1 ]; then
+                        # If DHCP is not used, ask for IP address/netmask/gateway/dns
+                        read -p "Type the IP address for the Management Network:" ovf_ip
+                        read -p "Type the Netmask for the Management Network:" ovf_netmask
+                        read -p "Type the Gateway for the Management Network:" ovf_gateway
+                fi
+
+                # Setting Management Network
+                cat > /etc/network/interfaces << EOF
+# This file describes the network interfaces available on your system
+# and how to activate them. For more information, see interfaces(5).
+                
+# The loopback network interface
+auto lo
+iface lo inet loopback
+                
+# The primary network interface
+iface eth0 inet manual
+auto pnet0
+EOF
+
+                if [[ "$ovf_dhcp" == 0 ]]; then
+                    echo "iface pnet0 inet dhcp" >> /etc/network/interfaces
+                    echo "    bridge_ports eth0" >> /etc/network/interfaces
+                    echo "    bridge_stp off" >> /etc/network/interfaces
+                elif [[ "$ovf_dhcp" == 1 ]]; then
+                    echo "iface pnet0 inet static" >> /etc/network/interfaces
+                    echo "    address ${ovf_ip}" >> /etc/network/interfaces
+                    echo "    netmask ${ovf_netmask}" >> /etc/network/interfaces
+                    echo "    gateway ${ovf_gateway}" >> /etc/network/interfaces
+                    # echo "    dns-nameservers ${ovf_dns1} ${ovf_dns2}" >> /etc/network/interfaces
+                    echo "    dns-nameservers 114.114.114.114 223.5.5.5" >> /etc/network/interfaces
+                    echo "    bridge_ports eth0" >> /etc/network/interfaces
+                    echo "    bridge_stp off" >> /etc/network/interfaces
+                fi
+
+                cat >> /etc/network/interfaces << EOF
+                
+# Cloud devices
+iface eth1 inet manual
+auto pnet1
+
+iface pnet1 inet manual
+    bridge_ports eth1
+    bridge_stp off
+
+iface eth2 inet manual
+auto pnet2
+iface pnet2 inet manual
+    bridge_ports eth2
+    bridge_stp off
+
+iface eth3 inet manual
+auto pnet3
+iface pnet3 inet manual
+    bridge_ports eth3
+    bridge_stp off
+
+iface eth4 inet manual
+auto pnet4
+iface pnet4 inet manual
+    bridge_ports eth4
+    bridge_stp off
+
+iface eth5 inet manual
+auto pnet5
+iface pnet5 inet manual
+    bridge_ports eth5
+    bridge_stp off
+
+iface eth6 inet manual
+auto pnet6
+iface pnet6 inet manual
+    bridge_ports eth6
+    bridge_stp off
+
+iface eth7 inet manual
+auto pnet7
+iface pnet7 inet manual
+    bridge_ports eth7
+    bridge_stp off
+
+iface eth8 inet manual
+auto pnet8
+iface pnet8 inet manual
+    bridge_ports eth8
+    bridge_stp off
+
+iface eth9 inet manual
+auto pnet9
+iface pnet9 inet manual
+    bridge_ports eth9
+    bridge_stp off
+EOF
+                echo 'You must restart your EVE-NG or execute command "service networking restart" to apply these changes !'
+                read -p "Press any key to continue...." ovf_dhcp
+                break
+            fi
+        done
+	;;
+    1)
+        sed -i "/\$node_templates\[\$templ\]/c\\\t\t\tunset(\\\$node_templates\[\$templ\]);" $include/init.php
+        echo "Hide invalid device Success! Press any key to continue...."
+	sleep 1
+    ;;
+    1p)
+	sed -i "s/DEFINE.*/DEFINE('TEMPLATE_DISABLED','.hided');/g" /opt/unetlab/html/includes/config.php
+        echo "Hide invalid device Success! Press any key to continue...."
+        sleep 1
+    ;;
+    r1)
+	sed -i "/\$node_templates\[\$templ\]/c\\\t\t\t\\\$node_templates\[\\\$templ\] = \\\$desc.\'.missing\'  ;" $include/init.php
+        echo "Hide invalid device Success! Press any key to continue...."
+        sleep 1
+    ;;
+    2)
+	sed -i 's/us.archive/cn.archive/g' /etc/apt/sources.list
+	sed -i '/repo.eve-ng.org/d;/^deb.*www.eve-ng.net/i\deb [arch=amd64] http://repo.eve-ng.org:81/repo xenial main\' /etc/apt/sources.list
+	# sed -i 's/^deb.*www.eve-ng.net/# &/g' /etc/apt/sources.list
+        echo "Modify update Source Success! Press any key to continue...."
+	sleep 1
+    ;;
+    r2)
+        sed -i 's/cn.archive/us.archive/g' /etc/apt/sources.list
+        sed -i '/repo.eve-ng.org/d;' /etc/apt/sources.list
+        echo "Modify update Source Success! Press any key to continue...."
+        sleep 1
+    ;;
+    3)
+	#ping -c 1 www.baidu.com > /dev/null 2>&1 
+	wget --connect-timeout 2 http://repo.eve-ng.org:81 -q --delete-after > /dev/null 2>&1
+	if [ $? -eq 0 ];
+	then
+		apt-get update && apt-get dist-upgrade -y
+		dpkg -l eve-ng*
+        	echo "Update Success! Press any key to continue...." 
+		sleep 1
+	else
+		echo "Not connected to the internet?";
+		sleep 3
+	fi;
+    ;;
+    4)
+        cat > $pwd/$res/IOUKeygen.py <<EOF
+#! /usr/bin/python
+# Cisco IOU License Generator - Kal 2011, python port of 2006 C version
+# Modified to work with python3 by c_d 2014
+import os
+import socket
+import hashlib
+import struct
+
+# get the host id and host name to calculate the hostkey
+hostid=os.popen("hostid").read().strip()
+hostname = socket.gethostname()
+ioukey=int(hostid,16)
+for x in hostname:
+ ioukey = ioukey + ord(x)
+
+# create the license using md5sum
+iouPad1 = b'\x4B\x58\x21\x81\x56\x7B\x0D\xF3\x21\x43\x9B\x7E\xAC\x1D\xE6\x8A'
+iouPad2 = b'\x80' + 39*b'\0'
+md5input=iouPad1 + iouPad2 + struct.pack('!i', ioukey) + iouPad1
+iouLicense=hashlib.md5(md5input).hexdigest()[:16]
+
+# print("\nAdd the following text to ~/.iourc:")
+print("[license]\n" + hostname + " = " + iouLicense + ";\n")
+# print("You can disable the phone home feature with something like:")
+# print(" echo '127.0.0.127 xml.cisco.com' >> /etc/hosts\n")
+EOF
+        python $pwd/$res/IOUKeygen.py >/opt/unetlab/addons/iol/bin/iourc
+        rm $pwd/$res/IOUKeygen.py
+        echo "Generate IOU License Success! Press any key to continue...."
+	sleep 1
+    ;;
+    5)
+        /opt/unetlab/wrappers/unl_wrapper -a fixpermissions
+        echo "Fixpermissions Success! Press any key to continue...."
+	sleep 1
+    ;;
+    6)
+        sed -i "/config_h3c.py/d ; /config_mikrotik.py/i\\\t\t'h3cvsr2k'\t\t=>\t'config_h3c.py',\n\t\t'h3cvfw1k'\t\t=>\t'config_h3c.py',\n\t\t'h3cvlb1k'\t\t=>\t'config_h3c.py',\n\t\t'h3cvbras1k'\t\t=>\t'config_h3c.py'," $include/init.php
+	sed -i "/H3C/d ; /'Virtual PC/i\\\t\t'h3cvfw1k'\t\t=>\t'H3C vFW1000',\n\t\t'h3cvsr2k'\t\t=>\t'H3C vSR2000',\n\t\t'h3cvlb1k'\t\t=>\t'H3C vLB1000',\n\t\t'h3cvlb1k'\t\t=>\t'H3C vLB1000',\n\t\t'h3cvbras1k'\t\t=>\t'H3C vBras1000'," $include/init.php
+	if ! ( grep -i case\\s\'h3cvsr2k\' /opt/unetlab/html/includes/__node.php ) > /dev/null;then
+		sed -i "/case 'a10':/i\\\n\t\t\t\t\tcase 'h3cvsr2k':\n\t\t\t\t\tcase 'h3cvbras1k':\n\t\t\t\t\tcase 'h3cvfw1k':\n\t\t\t\t\tcase 'h3cvlb1k':\n\t\t\t\t\t\tfor (\$i = 0; \$i < \$this -> ethernet; \$i++) {\n\t\t\t\t\t\t\t\$n = 'Gi'.(\$i+1).'/0';                // Interface name\n\t\t\t\t\t\t\tif (isset(\$old_ethernets[\$i])) {\n\t\t\t\t\t\t\t\t// Previous interface found, copy from old one\n\t\t\t\t\t\t\t\t\$this -> ethernets[\$i] = \$old_ethernets[\$i];\n\t\t\t\t\t\t\t} else {\n\t\t\t\t\t\t\t\ttry {\n\t\t\t\t\t\t\t\t\t\$this -> ethernets[\$i] = new Interfc(Array('name' => \$n, 'type' => 'ethernet'), \$i);\n\t\t\t\t\t\t\t\t} catch (Exception \$e) {\n\t\t\t\t\t\t\t\t\terror_log(date('M d H:i:s ').'ERROR: '.\$GLOBALS['messages'][40020]);\n\t\t\t\t\t\t\t\t\terror_log(date('M d H:i:s ').(string) \$e);\n\t\t\t\t\t\t\t\t\treturn 40020;\n\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t// Setting CMD flags (virtual device and map to TAP device)\n\t\t\t\t\t\t\t\$this -> flags_eth .= ' -device %NICDRIVER%,netdev=net'.\$i.',mac=50:'.sprintf('%02x', \$this -> tenant).':'.sprintf('%02x', \$this -> id / 512).':'.sprintf('%02x', \$this -> id % 512).':00:'.sprintf('%02x', \$i);\n\t\t\t\t\t\t\t\$this -> flags_eth .= ' -netdev tap,id=net'.\$i.',ifname=vunl'.\$this -> tenant.'_'.\$this -> id.'_'.\$i.',script=no';\n\t\t\t\t\t\t}\n\t\t\t\t\t\tbreak;\n" $include/__node.php
+	else
+	        sed -i "/case\\s\'vsr\'/c\\\t\t\t\t\tcase\\s\'h3cvsr2k\':\n" $include/__node.php
+                sed -i "/case\\s\'vfw\'/c\\\t\t\t\t\tcase\\s\'h3cvfw1k\':\n" $include/__node.php
+                sed -i "/case\\s\'vlb\'/c\\\t\t\t\t\tcase\\s\'h3cvlb1k\':\n" $include/__node.php
+	fi
+	cp -rf $pwd/$res/h3cvlb1k.png $icon/h3cvlb1k.png
+	cp -rf $pwd/$res/h3cvlb1k.php $template/h3cvlb1k.php
+	cp -rf $pwd/$res/h3cvsr2k.png $icon/h3cvsr2k.png
+	cp -rf $pwd/$res/h3cvsr2k.php $template/h3cvsr2k.php
+	cp -rf $pwd/$res/h3cvfw1k.png $icon/h3cvfw1k.png
+	cp -rf $pwd/$res/h3cvfw1k.php $template/h3cvfw1k.php
+	cp -rf $pwd/$res/h3cvbras1k.png $icon/h3cvbras1k.png
+	cp -rf $pwd/$res/h3cvbras1k.php $template/h3cvbras1k.php
+        cp -rf $pwd/$res/config_h3c.py $template/config_h3c.py
+	echo -e "Please create directories manually.\nDirectory name: \n\033[31m\tH3C vFW:\th3cvfw1k-xxxx\n\tH3C vLB:\th3cvlb1k-xxxx\n\tH3C vSR:\th3cvsr2k-xxxx\n\tH3C vBRAS:\th3cvbras1k-xxxx\033[0m"
+        echo "Add H3C Device Support Success! Press any key to continue...." 
+	sleep 2
+    ;;
+    6p)
+	sed -i "/H3C/d" $include/config.php
+	ctemp=`grep '^[^/]..*=>' $include/config.php | wc -l`
+	if [ $ctemp -gt 0 ];then dot=","; else dot="";fi
+	sed -i "/H3C/d ; /Array(/a\\\t\t'h3cvfw1k'\t\t=>\t'H3C vFW1000',\n\t\t'h3cvsr2k'\t\t=>\t'H3C vSR2000',\n\t\t'h3cvlb1k'\t\t=>\t'H3C vLB1000',\n\t\t'h3cvbras1k'\t\t=>\t'H3C vBras1000'$dot" $include/config.php
+        cp -rf $pwd/$res/h3cvlb1k.png $icon/h3cvlb1k.png
+        cp -rf $pwd/$res/h3cvlb1k.php $template/h3cvlb1k.php
+        cp -rf $pwd/$res/h3cvsr2k.png $icon/h3cvsr2k.png
+        cp -rf $pwd/$res/h3cvsr2k.php $template/h3cvsr2k.php
+        cp -rf $pwd/$res/h3cvfw1k.png $icon/h3cvfw1k.png
+        cp -rf $pwd/$res/h3cvfw1k.php $template/h3cvfw1k.php
+        cp -rf $pwd/$res/h3cvbras1k.png $icon/h3cvbras1k.png
+        cp -rf $pwd/$res/h3cvbras1k.php $template/h3cvbras1k.php
+        echo -e "Please create directories manually.\nDirectory name: \n\033[31m\tH3C vFW:\th3cvfw1k-xxxx\n\tH3C vLB:\th3cvlb1k-xxxx\n\tH3C vSR:\th3cvsr2k-xxxx\n\tH3C vBRAS:\th3cvbras1k-xxxx\033[0m"
+        echo "Add H3C Device Support Success! Press any key to continue...." 
+        sleep 3
+	
+	;;
+    7)
+	sed -i "/config_hillstone.py/d ; /config_mikrotik.py/i\\\t\t'hillstone'\t\t=>\t'config_hillstone.py'," $include/init.php
+	sed -i "/HillStone/d;/'Virtual PC/i\\\t\t'hillstone'\t\t\t=>\t'HillStone SG6000'," $include/init.php
+	if ! ( grep -i \'hillstone\' /opt/unetlab/html/includes/__node.php ) > /dev/null;then
+		sed -i "/case 'a10':/i\\\t\t\t\t\tcase 'hillstone':\n\t\t\t\t\t\tfor (\$i = 0; \$i < \$this -> ethernet; \$i++) {\n\t\t\t\t\t\t\t\$n = 'Ethernet0/'.\$i;                // Interface name\n\t\t\t\t\t\t\tif (isset(\$old_ethernets[\$i])) {\n\t\t\t\t\t\t\t\t// Previous interface found, copy from old one\n\t\t\t\t\t\t\t\t\$this -> ethernets[\$i] = \$old_ethernets[\$i];\n\t\t\t\t\t\t\t} else {\n\t\t\t\t\t\t\t\ttry {\n\t\t\t\t\t\t\t\t\t\$this -> ethernets[\$i] = new Interfc(Array('name' => \$n, 'type' => 'ethernet'), \$i);\n\t\t\t\t\t\t\t\t} catch (Exception \$e) {\n\t\t\t\t\t\t\t\t\terror_log(date('M d H:i:s ').'ERROR: '.\$GLOBALS['messages'][40020]);\n\t\t\t\t\t\t\t\t\terror_log(date('M d H:i:s ').(string) \$e);\n\t\t\t\t\t\t\t\t\treturn 40020;\n\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t// Setting CMD flags (virtual device and map to TAP device)\n\t\t\t\t\t\t\t\$this -> flags_eth .= ' -device %NICDRIVER%,netdev=net'.\$i.',mac=50:'.sprintf('%02x', \$this -> tenant).':'.sprintf('%02x', \$this -> id / 512).':'.sprintf('%02x', \$this -> id % 512).':00:'.sprintf('%02x', \$i);\n\t\t\t\t\t\t\t\$this -> flags_eth .= ' -netdev tap,id=net'.\$i.',ifname=vunl'.\$this -> tenant.'_'.\$this -> id.'_'.\$i.',script=no';\n\t\t\t\t\t\t}\n\t\t\t\t\t\tbreak;\n" $include/__node.php
+	fi
+	cp -rf $pwd/$res/hillstone.png $icon/hillstone.png
+	cp -rf $pwd/$res/hillstone.php $template/hillstone.php
+        cp -rf $pwd/$res/config_hillstone.py $template/config_hillstone.py
+	echo -e "Please create directories manually.\nDirectory name: \n\033[31m\tHillstone SG6000:\thillstone-xxxx\033[0m"
+        echo "Add Hillstone Device Support Success! Press any key to continue...." 
+	sleep 3
+	;;
+
+
+    7p)
+	sed -i "/HillStone/d" $include/config.php
+	ctemp=`grep '^[^/]..*=>' $include/config.php | wc -l`
+	if [ $ctemp -gt 0 ];then dot=","; else dot="";fi
+	sed -i "/Array(/a\\\t\t'hillstone'\t\t\t=>\t'HillStone SG6000'$dot" $include/config.php
+	cp -rf $pwd/$res/hillstone.png $icon/hillstone.png
+	cp -rf $pwd/$res/hillstone.php $template/hillstone.php
+	echo -e "Please create directories manually.\nDirectory name: \n\033[31m\tHillstone SG6000:\thillstone-xxxx\033[0m"
+	echo "Add Hillstone Device Support Success! Press any key to continue...." 
+	sleep 3
+	;;
+    
+    8)
+	sed -i "/AlteonOS/d;/'Virtual PC/i\\\t\t'radware'\t\t\t=>\t'Radware AlteonOS'," $include/init.php
+	cp -rf $pwd/$res/radware.png $icon/radware.png
+        cp -rf $pwd/$res/radware.php $template/radware.php
+        echo -e "Please create directories manually.\nDirectory name: \n\033[31m\tRadware AlteonOS:\tradware-xxxx\033[0m"
+        echo "Add Radware Device Support Success! Press any key to continue...."
+	sleep 1
+	;;
+    9)
+	sed -i "/Zabbix/d;/'Virtual PC/i\\\t\t'zabbix'\t\t\t=>\t'Zabbix'," $include/init.php
+	sed -i "/Nagios/d;/'Virtual PC/i\\\t\t'nagios'\t\t\t=>\t'Nagios'," $include/init.php
+	cp -rf $pwd/$res/Zabbix.png $icon/Zabbix.png
+        cp -rf $pwd/$res/zabbix.php $template/zabbix.php
+	cp -rf $pwd/$res/Nagios.png $icon/Nagios.png
+	cp -rf $pwd/$res/nagios.php $template/nagios.php
+        echo -e "Please create directories manually.\nDirectory name: \n\033[31m\tZabbix:\tzabbix-xxxx\n\tNagios:\tnagios-xxxx\033[0m"
+        echo "Add Zabbix/Nagios Device Support Success! Press any key to continue...."
+	sleep 1
+    	;;
+    10)
+	sed -i "/ESXi/d;/'Virtual PC/i\\\t\t'esxi'\t\t\t=>\t'VMware ESXi'," $include/init.php
+	cp -rf $pwd/$res/ESXi.png $icon/ESXi.png
+        cp -rf $pwd/$res/esxi.php $template/esxi.php
+	echo 'options kvm_intel nested=1' >>  /etc/modprobe.d/kvm-intel.conf
+        echo 'options kvm ignore_msrs=1' >>  /etc/modprobe.d/kvm-intel.conf
+        echo -e "Please create directories manually.\nDirectory name: \n\033[31m\tVMware ESXi:\tesxi-xxxx\033[0m\n\t\n\033[32mSuccessfully!\033[0m\033[33m\nPlease reboot system to active virtualization on EVE-NG!\033[0m"
+        read -p "Reboot system now ? [Y/N]" select
+	if [ "$select" == Y ]; then
+		shutdown 1 -r
+	fi
+    	;;
+    11)
+	sed -i "/Synology/d;/'Virtual PC/i\\\t\t'synology'\t\t\t=>\t'Synology'," $include/init.php
+	sed -i "/FreeNAS/d;/'Virtual PC/i\\\t\t'freenas'\t\t\t=>\t'FreeNAS'," $include/init.php
+	sed -i "/OpenE/d;/'Virtual PC/i\\\t\t'opene'\t\t\t=>\t'OpenE'," $include/init.php
+	sed -i "/Openfiler/d;/'Virtual PC/i\\\t\t'openfiler'\t\t\t=>\t'Openfiler'," $include/init.php
+	sed -i "/Seafile/d;/'Virtual PC/i\\\t\t'seafile'\t\t\t=>\t'Seafile'," $include/init.php
+	cp -rf $pwd/$res/Synology.png $icon/Synology.png
+        cp -rf $pwd/$res/synology.php $template/synology.php
+	cp -rf $pwd/$res/FreeNAS.png $icon/FreeNAS.png
+	cp -rf $pwd/$res/freenas.php $template/freenas.php
+	cp -rf $pwd/$res/OpenE.png $icon/OpenE.png
+	cp -rf $pwd/$res/opene.php $template/opene.php
+	cp -rf $pwd/$res/Openfiler.png $icon/Openfiler.png
+	cp -rf $pwd/$res/openfiler.php $template/openfiler.php
+	cp -rf $pwd/$res/Seafile.png $icon/Seafile.png
+	cp -rf $pwd/$res/seafile.php $template/seafile.php
+        echo -e "Please create directories manually.\nDirectory name: \n\033[31m\tSynology:\tsynology-xxxx\n\tFreeNAS:\tfreenas-xxxx\n\tOpenE:\t\topene-xxxx\n\tOpenfiler:\topenfiler-xxxx\n\tSeafile:\tseafile-xxxx\033[0m"
+        echo "Add Storage Device Support Success! Press any key to continue...."
+	sleep 1
+	;;
+    12)
+        sed -i "/OpenWRT/d;/Virtual PC/i\\\t\t'openwrt'\t\t\t=>\t'OpenWRT'," $include/init.php
+        sed -i "/iKuai/d;/Virtual PC/i\\\t\t'ikuai'\t\t\t=>\t'iKuai'," $include/init.php
+        sed -i "/Panabit/d;/Virtual PC/i\\\t\t'panabit'\t\t\t=>\t'Panabit'," $include/init.php
+        cp -rf $pwd/$res/OpenWRT.png $icon/OpenWRT.png
+        cp -rf $pwd/$res/openwrt.php $template/openwrt.php
+        cp -rf $pwd/$res/iKuai.png $icon/iKuai.png
+        cp -rf $pwd/$res/ikuai.php $template/ikuai.php
+        cp -rf $pwd/$res/Panabit.png $icon/Panabit.png
+        cp -rf $pwd/$res/panabit.php $template/panabit.php
+        echo -e "Please create directories manually.\nDirectory name: \n\033[31m\tOpenWRT:\topenwrt-xxxx\n\tiKuai:\t\tikuai-xxxx\n\tPanabit:\tpanabit-xxxx\033[0m"
+        echo "Add Software Router Device Support Success! Press any key to continue...."
+	sleep 1
+	;;
+    13)
+        sed -i "/Openstack/d;/Linux/i\\\t\t'openstack'\t\t\t=>\t'Openstack'," $include/init.php
+        sed -i "/Dockerserver/d;/Linux/i\\\t\t'dockerserver'\t\t\t=>\t'Dockerserver'," $include/init.php
+        cp -rf $pwd/$res/Openstack.png $icon/Openstack.png
+        cp -rf $pwd/$res/openstack.php $template/openstack.php
+        cp -rf $pwd/$res/Dockerserver.png $icon/Dockerserver.png
+        cp -rf $pwd/$res/dockerserver.php $template/dockerserver.php
+        echo -e "Please create directories manually.\nDirectory name: \n\033[31m\tOpenstack:\topenstack-xxxx\n\tDockerserver:\tdockerserver-xxxx\033[0m"
+        echo "Add Openstack/Docker Device Support Success! Press any key to continue...."
+	sleep 1
+	;;
+    14)
+        sed -i "/Android/d;/Linux/i\\\t\t'android'\t\t\t=>\t'Android'," $include/init.php
+        cp -rf $pwd/$res/Android.png $icon/Android.png
+        cp -rf $pwd/$res/android.php $template/android.php
+        echo -e "Please create directories manually.\nDirectory name: \n\033[31m\tAndroid:\tandroid-xxxx\033[0m"
+        echo "Add Android Device Support Success! Press any key to continue...."
+	sleep 1
+	;;
+
+    15)
+	sed -i "/Download Conifg/d;/\\.pull-right/a\\\t\t<a type=\"button\" class=\"btn btn-default btn-sm\" data-toggle=\"tooltip\" title=\"Download Conifg\" href=\"/config.php\" target=\"_blank\"><i class=\"glyphicon glyphicon-align-left\"></i></a>" /opt/unetlab/html/themes/adminLTE/unl_data/pages/main.html
+	cp -rf $pwd/$res/config.php $html/config.php
+        cp -rf $pwd/$res/config.pyc $script/config.pyc
+	echo "Add Configuration Management Support Success! Press any key to continue...."
+	sleep 1
+	;;
+    d)
+	echo "####################### Eve-ng version:#######################" > $html/diag.log
+	dpkg -l | grep eve-ng >> $html/diag.log
+
+	echo "####################### Dynamips Files:#######################" >> $html/diag.log
+	ls -Al /opt/unetlab/addons/dynamips/*.image >> $html/diag.log
+
+	echo "####################### IOL Files:#######################" >> $html/diag.log
+	ls -Al /opt/unetlab/addons/iol/bin/*.bin >> $html/diag.log
+
+	echo "####################### Hostname#######################" >> $html/diag.log
+	hostname >> $html/diag.log
+
+	echo "####################### iourc File#######################" >> $html/diag.log
+	cat /opt/unetlab/addons/iol/bin/iourc >> $html/diag.log
+
+	echo "####################### Platform#######################" >> $html/diag.log
+	dmidecode | grep 'Product Name:'| head -1 >> $html/diag.log
+
+	echo "####################### KVM-OK#######################" >> $html/diag.log
+	kvm-ok >> $html/diag.log
+
+	echo "####################### Qemu Files#######################" >> $html/diag.log
+	ls -AlR /opt/unetlab/addons/qemu/ >> $html/diag.log
+
+	echo "Create diag file Success! Press check http://ServerIP/diag.log"
+	sleep 2
+	;;
+
+    p)
+	#ping -c 1 www.baidu.com > /dev/null 2>&1
+	wget --connect-timeout 2 http://repo.eve-ng.org:81 -q --delete-after > /dev/null 2>&1
+	if [ $? -eq 0 ];
+        then
+	    if [ "`awk -F'-' '{print $3}' /opt/unetlab/html/themes/adminLTE/VERSION`" == "PRO" ];then
+	 	mv /opt/unetlab/wrappers/unl_wrapper{,.bak}
+		wget http://repo.eve-ng.org:81/`cat /opt/unetlab/html/themes/adminLTE/VERSION`/unl_wrapper -q -O /opt/unetlab/wrappers/unl_wrapper
+		filesize=`ls -l /opt/unetlab/wrappers/unl_wrapper | awk '{ print $5 }'`
+		if [ $filesize -gt 10000 ];then 
+			chmod a+x /opt/unetlab/wrappers/unl_wrapper
+			echo "Enable EVE-NG Pro evaluation Patch Success!!"
+		else
+			mv /opt/unetlab/wrappers/unl_wrapper{.bak,}
+			echo "Patch NOT support your version(`cat /opt/unetlab/html/themes/adminLTE/VERSION`)!! Please Contact US.."
+		fi
+	    else
+		echo "Current EVE-NG Version : "`cat /opt/unetlab/html/themes/adminLTE/VERSION`"! NOT EVE-NG PRO Edition"
+	    fi
+	    sleep 3
+	else
+                echo "Not connected to the internet?";
+				sleep 3
+        fi;
+	;;
+
+    u|U)
+	#ping -c 1 www.baidu.com > /dev/null 2>&1
+	wget --connect-timeout 2 http://repo.eve-ng.org:81 -q --delete-after > /dev/null 2>&1
+	if [ $? -eq 0 ];
+	then
+		cd $pwd
+		wget http://repo.eve-ng.org:81/sign -O sign -o /var/log/eve-ng-toolkit.log
+		if [ -e sign ];then
+			md5sum -c sign --status;
+			if [ "$?" -ne "0" ];then
+				echo 'New version was detected!'
+				echo 'Downloading...'
+				sleep 1
+				wget -q --connect-timeout 2 http://repo.eve-ng.org:81/eve-ng-toolkit.tgz -O eve-ng-toolkit.tgz
+				if [ -e eve-ng-toolkit.tgz ];then
+					echo 'Decompression...'
+					sleep 1
+					tar zxf eve-ng-toolkit.tgz -C /usr/share && \
+					rm -rf eve-ng-toolkit.tgz && \
+					ln -sf /usr/share/eve-ng-toolkit/eve-ng-toolkit /usr/bin/eve-ng-toolkit && \
+					eve-ng-toolkit
+               	else
+                   	read -p 'Error,See log file: /var/log/eve-ng-toolkit.log'
+               	fi
+			else
+				echo 'EVE-NG is the latest version..';
+				sleep 1
+			fi
+		rm sign
+		else
+			read -p 'No sign file!'
+		fi
+	else
+		echo "Not connected to the internet?";
+		sleep 3
+	fi
+	;;
+
+    1111|e|E|exit|EXIT|Exit)
+        echo "Exit."
+        e=1
+	;;
+    99)
+	sed -i "s/\s.interfaces += /\/\/#interfaces += /g" /opt/unetlab/html/themes/default/js/actions.js 
+	sed -i "s/\s.\/\/interfaces += /interfaces += /g" /opt/unetlab/html/themes/default/js/actions.js 
+	;;
+    r99)
+	sed -i "s/\s.interfaces += /  \/\/interfaces += /g" /opt/unetlab/html/themes/default/js/actions.js 
+	sed -i "s/\/\/#interfaces += /interfaces += /g" /opt/unetlab/html/themes/default/js/actions.js
+	;;
+    100)
+	echo "This command is not supported at EVE-NG Pro Edition!!\nYou can create "linux-xxxx" directory to start it."
+	sleep 5
+	;;
+    *)
+    	echo "Invalid "
+	sleep 1
+    esac
+ done
+if [ $e -eq 1 ];then break;fi
+done

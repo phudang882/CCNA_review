@@ -1,0 +1,19 @@
+IPSEC là công nghệ để bảo mật tunnel VPN.
+Gồm 2 pha:
+		Pha 1: Dùng để setup đường hầm VPN pha 2
+		Pha 2: Đường truyền giữa 2 router
+	Gồm 1 bộ proposal (bộ đề xuất):
+		Cách xác thực: pre-sharekey, or rsa (Tính xác thực dữ liệu)
+		Cách mã hóa: aes, 3des, .... dùng mã hóa đối xứng (tính bí mật dữ liệu)
+		Key mã hóa dùng Diffie-Hellman để trao đổi khóa mã hóa
+		Hash (Dùng để tính toàn vẹn dữ liệu)
+
+Cấu hình IPSEC:
+	Bước 1: Cấu hình Pha 1: isakmp
+		Cấu hình Proposal
+		Cấu hình pre-sharekey key và ip của đầu kia(nếu là GRE thì không phải là đầu của tunnel)
+	Bước 2: Cấu hình Pha 2: ipsec
+		Cấu hình Proposal hoặc dùng của pha 1 cũng được
+		Chọn mode ESP hoặc AH
+		Chọn mode Transport hoặc Tunnel
+		
